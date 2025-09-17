@@ -1,0 +1,185 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Project "Dinô" {
+  datatype: 'SQLITE'
+  Note: 'Projeto desenvolvido para o Trabalho de conclusão de curso.'
+}
+
+// TABELA PREENCHIDA PELO SISTEMA
+Table category {
+  id integer [pk, increment]
+  code text [
+    not null,
+    note: "education, health, entertainment, food, housing,\
+    transportation, services, shopping, taxes, others"
+  ]
+}
+
+Table transfer_method {
+  id integer [pk, increment]
+  code text [
+    not null,
+    note: "[pix, debit, cash]"
+  ]
+  note: "Semelhante a um atributo type"
+}
+
+Table transaction_instrument {
+  id integer [pk, increment]
+  fk_id_transfer_method integer [not null, ref: > transfer_method.id]
+  fk_id_bank_account integer [ref: > bank_account.id]
+  is_enabled bool [not null, default: "true"]
+  nickname text [note: "Nome amigável, ex: 'Pix Nubank', Dinheiro"]
+} 
+/*
+  HERANÇA DE TABELA DE CLASSES
+  POIS NÃO SERÃO INSERIDOS MAIS TIPOS.
+
+  Herança de tabela única:
+  https://martinfowler.com/eaaCatalog/singleTableInheritance.html
+  Herança de tabela de classes:
+  https://martinfowler.com/eaaCatalog/classTableInheritance.html
+  Herança de tabela concreta:
+  https://martinfowler.com/eaaCatalog/concreteTableInheritance.html
+*/
+Table base_transaction_type {
+  id integer [pk, increment]
+  description text [not null]
+  // 0 = Entrada, 1 = Saída; CHECK(type IN (0,1))
+  cashflow_type integer [not null]
+  fk_id_transaction_instrument integer [
+    not null,
+    ref: > transaction_instrument.id
+  ]
+  fk_id_category integer [not null, ref: > category.id]
+}
+
+Table item_value {
+  id integer [pk, increment]
+  scheduled_at date [not null]
+  amount integer [
+    not null,
+    note: "Guardado em centavos para garantir que o cálculo\
+    será feito corretamente"
+  ]
+  // Indica se a transferência já foi executada.
+  // Se um recebimento foi recebido e se um pagamento foi pago
+  was_processed boolean [
+    not null,
+    default: false,
+    note: '''
+      Indica se a transferência já foi executada
+      Se um recebimento foi recebido e se um pagamento foi pago
+    '''
+  ]
+}
+
+Table standard {
+  id integer [pk, increment, ref: > base_transaction_type.id]
+  fk_id_item_value integer [not null, ref: - item_value.id]
+}
+
+// TABELA PREENCHIDA PELO SISTEMA
+Table recurrence_type {
+  id integer [pk, increment]
+  code text [not null, unique, note: "[monthly, yearly]"] 
+}
+
+Table recurring {
+  id integer [
+    pk,
+    increment,
+    ref: > base_transaction_type.id,
+    note: "Com isso ao buscar uma transação eu consigo 'linkar'\
+    com o tipo especializado"
+  ]
+  start_date date [not null]
+  end_date date
+  current_amount integer [
+    not null,
+    note: "Guardado em centavos"
+  ]
+  fk_id_recurrence_type integer [not null, ref: > recurrence_type.id]
+}
+
+Table recurring_item_value {
+  id integer [pk, increment]
+  fk_id_recurring integer [not null, ref: > recurring.id]
+  fk_id_item_value integer [not null, ref: - item_value.id]
+}
+
+Table installment {
+  id integer [pk, increment, ref: > base_transaction_type.id]
+  start_date date [not null]
+  installments_number integer [not null]
+  total_amount integer [
+    not null,
+    note: "Guardado em centavos"
+  ]
+}
+
+Table installment_item_value {
+  id integer [pk, increment]
+  fk_id_installment integer [not null, ref: > installment.id]
+  fk_id_item_value integer [not null, ref: - item_value.id]
+}
+
+Table bank_account {
+  id integer [pk, increment]
+  nickname text [not null]
+}
+
+Table balance_bank {
+  id integer [pk, increment]
+  fk_id_bank_account integer [not null, ref: > bank_account.id]
+  opening_balance date [not null]
+  closing_balance date [not null]
+  current_amount integer [
+    not null,
+    note: "Guardado em centavos"
+  ]
+}
+
+Table balance_cash {
+  id integer [pk, increment]
+  opening_balance date [not null]
+  closing_balance date [not null]
+  current_amount integer [
+    not null,
+    note: "Guardado em centavos"
+  ]
+}
+
+// TRABALHOS FUTUROS
+// Table credit_card {
+//   id integer [pk, ref: > transaction_instrument.id]
+//   limit integer [
+//     not null,
+//     note: "Guardado em centavos"
+//   ]
+//   closing_date date [
+//     not null,
+//     note: "data de fechamento da fatura do cartão"
+//   ]
+//   due_date date [
+//     not null,
+//     note: "data de vencimento da fatura do cartão"
+//   ]
+// }
+
+// Table statement_credit_card {
+//   id integer [pk, increment]
+//   fk_id_credit_card integer [not null, ref: > credit_card.id]
+//   opening_statement date [not null]
+//   closing_statement date [not null]
+// }
+ 
+// Table credit_card_transaction {
+//   id intger [pk, increment]
+//   fk_id_item_value integer [not null, ref: > item_value.id]
+//   fk_id_base_transaction_type integer [
+//     not null,
+//     ref: > base_transaction_type.id
+//   ]
+// }
