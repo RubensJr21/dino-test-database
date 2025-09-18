@@ -1,21 +1,21 @@
 -- =====================================
--- TABELAS DO SISTEMA - PROJETO "Dinô"
+-- TABELAS DO SISTEMA - PROJETO 'Dinô'
 -- =====================================
 
 -- ======================
 -- TABELA: category
 -- ======================
 INSERT INTO category (code) VALUES
-("ducation"),
-("health"),
-("entertainment"),
-("food"),
-("housing"),
-("transportation"),
-("services"),
-("shopping"),
-("taxes"),
-("others");
+('education'),
+('health'),
+('entertainment'),
+('food'),
+('housing'),
+('transportation'),
+('services'),
+('shopping'),
+('taxes'),
+('others');
 
 -- ======================
 -- TABELA: transfer_method
@@ -29,5 +29,5 @@ INSERT INTO transfer_method (code) VALUES
 -- TABELA: transfer_method
 -- ======================
 INSERT INTO recurrence_type (code) VALUES
-("monthly"),
-("yearly");
+('monthly'),
+('yearly');

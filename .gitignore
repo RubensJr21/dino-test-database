@@ -24,6 +24,7 @@ yarn-error.log*
 .idea/
 *.sublime-project
 *.sublime-workspace
+.idx/
 
 # Operating system files
 .DS_Store
