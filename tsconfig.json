@@ -9,13 +9,16 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "db": [
-        "playground/@configs/db.ts"
-      ],
       "@playground/*": [
         "playground/*"
+      ],
+      "@start-database/*": [
+        "playground/@start-database/*"
       ]
     },
   },
-  "include": ["playground"]
+  "include": ["playground", "@types", "playground/@start-database"],
+  "ts-node": {
+    "files": true
+  }
 }

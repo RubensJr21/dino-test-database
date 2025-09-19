@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "playground": "cd ./playground/ && ts-node -r tsconfig-paths/register"
+    "playground": "cd ./playground/ && ts-node -r tsconfig-paths/register",
+    "start-database": "cd ./playground/ && ts-node -r tsconfig-paths/register @start-database"
   },
   "keywords": [],
   "author": "",
