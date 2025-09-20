@@ -5,10 +5,37 @@ export function getRealAmountValue(
 ) {
 	// para não precisar verificar se tem que somar ou subtrair do saldo
 	const multiplyFactor = inverse ? -1 : 1;
-	return (cashflow_type * amount) * multiplyFactor;
+	return cashflow_type * amount * multiplyFactor;
 }
 
 // Sortear o cashflow_type (-1 = saída, 1 = entrada)
 export function getCashflowType(): -1 | 1 {
 	return Math.random() > 0.5 ? -1 : 1;
+}
+
+export function getRandomFloatBetween(min: number, max: number) {
+	return Math.random() * (max - min) + min;
+}
+
+export function getRandomIntegerBetween(min: number, max: number) {
+	min = Math.ceil(min); // Ensure min is rounded up
+	max = Math.floor(max); // Ensure max is rounded down
+	return Math.floor(Math.random() * (max - min)) + min;
+}
+
+export function getRandomIndex(size: number) {
+	return getRandomIntegerBetween(0, size);
+}
+
+export function getRandomFutureDate(daysAhead = 30) {
+	const today = new Date();
+
+	// gera número aleatório de dias no intervalo [0, daysAhead]
+	const randomDays = Math.floor(Math.random() * (daysAhead + 1));
+
+	// cria nova data adicionando os dias
+	const result = new Date(today);
+	result.setDate(today.getDate() + randomDays);
+
+	return result;
 }

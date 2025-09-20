@@ -28,14 +28,11 @@ export async function get_bank_id(
 	db: DatabaseType,
 	transaction_instrument_id: typeof transactionInstrument.$inferSelect.id
 ) {
-	return (await db
+	const [{ bank_id }] = await db
 		.select({
 			bank_id: transactionInstrument.fk_id_bank_account,
 		})
 		.from(transactionInstrument)
-		.innerJoin(
-			transferMethod,
-			eq(transactionInstrument.fk_id_transfer_method, transferMethod.id)
-		)
-		.where(eq(transferMethod.id, transaction_instrument_id)))[0].bank_id;
+		.where(eq(transactionInstrument.id, transaction_instrument_id));
+	return bank_id;
 }

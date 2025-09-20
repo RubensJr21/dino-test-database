@@ -1,16 +1,16 @@
+import { getRandomIntegerBetween } from "@playground/utils";
 import { db } from "./db-instance";
 import {
-  bankAccount,
-  category,
-  recurrenceType,
-  transactionInstrument,
-  transferMethod,
+	bankAccount,
+	category,
+	recurrenceType,
+	transactionInstrument,
+	transferMethod,
 } from "./schema";
 
 (async () => {
 	await populate_system_tables(db);
 	await populate_initial_tests_values(db);
-	db.$client.close()
 })();
 
 export async function populate_system_tables(
@@ -54,8 +54,9 @@ export async function populate_initial_tests_values(
 
 	const transfer_methods = await database.select().from(transferMethod);
 
-	const NUMBERS_OF_TM = 10;
-	for (let i = 0; i < Math.random() * NUMBERS_OF_TM; i++) {
+	const NUMBERS_OF_TI = getRandomIntegerBetween(2, 15);
+	console.log({ NUMBERS_OF_TI });
+	for (let i = 0; i < NUMBERS_OF_TI; i++) {
 		// Selecionar método de transferência
 		const randomIndexTM = Math.floor(Math.random() * transfer_methods.length);
 		const selected_transfer_method = transfer_methods[randomIndexTM];
@@ -66,12 +67,12 @@ export async function populate_initial_tests_values(
 			selected_bank_account_id = null;
 		} else {
 			const randomIndexBA = Math.floor(Math.random() * transfer_methods.length);
-			selected_bank_account_id = Number(bank_accounts[randomIndexBA].id);
+			selected_bank_account_id = bank_accounts[randomIndexBA].id;
 		}
 
 		await database.insert(transactionInstrument).values([
 			{
-				fk_id_transfer_method: Number(selected_transfer_method.id),
+				fk_id_transfer_method: selected_transfer_method.id,
 				fk_id_bank_account: selected_bank_account_id,
 			},
 		]);

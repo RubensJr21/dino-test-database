@@ -4,8 +4,9 @@
   "main": "index.js",
   "scripts": {
     "playground": "cd ./playground/ && ts-node -r tsconfig-paths/register",
-    "predatabase:start": "npm run database:clean && npm run database:push",
     "database:start": "ts-node -r tsconfig-paths/register @database/create",
+    "predatabase:reset": "npm run database:clean && npm run database:push",
+    "database:reset": "ts-node -r tsconfig-paths/register @database/create",
     "database:clean": "ts-node -r tsconfig-paths/register @database/clean",
     "database:push": "drizzle-kit --config drizzle.config.ts push"
   },

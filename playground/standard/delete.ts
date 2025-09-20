@@ -23,15 +23,14 @@ import { eq } from "drizzle-orm";
 	if (standard_for_delete === undefined) {
 		throw new Error("standard_id inexistente.");
 	}
-	// 2. Deletar dados relacionados do banco de dados
-	// 2.1. Deletar base_transaction_type
-	await btt.remove(db, standard_for_delete.id);
-	// 2.2. Deletar item_value
-	await iv.remove(db, [standard_for_delete.id]);
-	// 2.4. Deletar standard
-	await db.delete(standard).where(eq(standard.id, standard_for_delete.id));
 
-	// 2.4. Atualizar balance_cash ou balance_bank
+	await db.delete(standard).where(eq(standard.id, standard_for_delete.id));
+	await btt.remove(db, standard_for_delete.id);
+	await iv.remove(db, [standard_for_delete.id]);
+
+	// ======================================
+	// POST REMOVE
+	// ======================================
 	const month = standard_for_delete.scheduled_at.getMonth();
 	const year = standard_for_delete.scheduled_at.getFullYear();
 
@@ -65,5 +64,5 @@ import { eq } from "drizzle-orm";
 		}
 	}
 
-	console.log("standard inserido!");
+	console.log("standard removido!");
 })();
