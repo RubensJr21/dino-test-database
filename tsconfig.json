@@ -12,12 +12,12 @@
       "@playground/*": [
         "playground/*"
       ],
-      "@start-database/*": [
-        "playground/@start-database/*"
+      "@database/*": [
+        "@database/*"
       ]
     },
   },
-  "include": ["playground", "@types", "playground/@start-database"],
+  "include": ["playground", "@types", "@database", "drizzle.config.ts", "@database/db-instance.ts"],
   "ts-node": {
     "files": true
   }
