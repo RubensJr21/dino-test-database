@@ -7,3 +7,4 @@ const dbPath = path.resolve(__dirname, "dino.sqlite");
 
 export const sqlite = new Database(dbPath);
 export const db = drizzle(sqlite, { schema });
+export type DatabaseType = typeof db

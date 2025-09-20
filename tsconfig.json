@@ -1,24 +1,21 @@
 {
-  "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "@playground/*": [
-        "playground/*"
-      ],
-      "@database/*": [
-        "@database/*"
-      ]
-    },
-  },
-  "include": ["playground", "@types", "@database", "drizzle.config.ts", "@database/db-instance.ts"],
-  "ts-node": {
-    "files": true
-  }
+	"compilerOptions": {
+		"target": "es2020",
+		"module": "commonjs",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"outDir": "dist",
+		"baseUrl": ".",
+		"paths": {
+			"@data_functions/*": ["playground/@data_functions/*"],
+			"@playground/*": ["playground/*"],
+			"@database/*": ["@database/*"],
+		}
+	},
+	"include": ["playground/**/*", "@database/**/*", "drizzle.config.ts"],
+	"ts-node": {
+		"files": true
+	}
 }
