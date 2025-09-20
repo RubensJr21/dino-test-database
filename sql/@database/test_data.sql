@@ -5,19 +5,19 @@
 -- ======================
 -- TABELA: bank_account
 -- ======================
-INSERT INTO bank_account (id, nickname) VALUES
-(1, 'Nubank Conta Corrente'),
-(2, 'Itaú Conta Corrente'),
-(3, 'Caixa Poupança');
+INSERT INTO bank_account (nickname) VALUES
+('Nubank Conta Corrente'),
+('Itaú Conta Corrente'),
+('Caixa Poupança');
 
 -- ======================
 -- TABELA: transaction_instrument
 -- ======================
-INSERT INTO transaction_instrument (id, fk_id_transfer_method, fk_id_bank_account, is_enabled, nickname) VALUES
-(1, 1, 1, true, 'Pix Nubank'),
-(2, 2, 2, true, 'Cartão Débito Itaú'),
-(3, 3, NULL, true, 'Dinheiro em espécie'),
-(4, 1, 3, true, 'Pix Caixa Poupança');
+INSERT INTO transaction_instrument (fk_id_transfer_method, fk_id_bank_account) VALUES
+(1, 1),
+(2, 2),
+(3, NULL),
+(1, 3);
 
 -- ======================
 -- BALANCES
