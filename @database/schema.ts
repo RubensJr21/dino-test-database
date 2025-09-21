@@ -46,7 +46,7 @@ export const transactionInstrument = sqliteTable("transaction_instrument", {
 export const baseTransactionType = sqliteTable("base_transaction_type", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	description: text("description").notNull(),
-	cashflow_type: integer("cashflow_type").notNull(), // 0=Entrada, 1=Saída
+	cashflow_type: integer("cashflow_type").$type< -1 | 1>().notNull(), // 0=Entrada, 1=Saída
 	fk_id_transaction_instrument: integer("fk_id_transaction_instrument")
 		.notNull()
 		.references(() => transactionInstrument.id),
@@ -143,28 +143,36 @@ export const installmentItemValue = sqliteTable("installment_item_value", {
 // ======================
 // balance_bank
 // ======================
-export const balanceBank = sqliteTable("balance_bank", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	fk_id_bank_account: integer("fk_id_bank_account")
-		.notNull()
-		.references(() => bankAccount.id),
-	month: integer("month").notNull(),
-	year: integer("year").notNull(),
-	planned_amount: integer("planned_amount").notNull(),
-	executed_amount: integer("executed_amount").notNull(),
-}, (table) => ({
-  uniq: unique().on(table.fk_id_bank_account, table.month, table.year),
-}));
+export const balanceBank = sqliteTable(
+	"balance_bank",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		fk_id_bank_account: integer("fk_id_bank_account")
+			.notNull()
+			.references(() => bankAccount.id),
+		month: integer("month").notNull(),
+		year: integer("year").notNull(),
+		planned_amount: integer("planned_amount").notNull(),
+		executed_amount: integer("executed_amount").notNull(),
+	},
+	(table) => ({
+		uniq: unique().on(table.fk_id_bank_account, table.month, table.year),
+	})
+);
 
 // ======================
 // balance_cash
 // ======================
-export const balanceCash = sqliteTable("balance_cash", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	month: integer("month").notNull(),
-	year: integer("year").notNull(),
-	planned_amount: integer("planned_amount").notNull(),
-	executed_amount: integer("executed_amount").notNull(),
-}, (table) => ({
-  uniq: unique().on(table.month, table.year),
-}));
+export const balanceCash = sqliteTable(
+	"balance_cash",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		month: integer("month").notNull(),
+		year: integer("year").notNull(),
+		planned_amount: integer("planned_amount").notNull(),
+		executed_amount: integer("executed_amount").notNull(),
+	},
+	(table) => ({
+		uniq: unique().on(table.month, table.year),
+	})
+);
