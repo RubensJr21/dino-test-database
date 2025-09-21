@@ -22,7 +22,7 @@ const remove = async (standard_id: typeof standard.$inferSelect.id) => {
 
 	await db.delete(standard).where(eq(standard.id, standard_for_delete.id));
 	await btt.remove(db, standard_for_delete.id);
-	await iv.remove(db, [standard_for_delete.id]);
+	await iv.remove(db, [standard_for_delete.item_value_id]);
 
 	// ======================================
 	// POST REMOVE
@@ -67,3 +67,5 @@ async function main() {
 	const standard_id_for_delete = 1;
 	remove(standard_id_for_delete);
 }
+
+main()
