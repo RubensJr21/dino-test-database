@@ -8,5 +8,5 @@ export async function get_all(db: DatabaseType) {
 	return await db.select().from(transferMethod);
 }
 
-export type { DataInsert as btt_infer_insert, DataSelect as btt_infer_select };
+export type { DataInsert as infer_insert, DataSelect as infer_select };
 

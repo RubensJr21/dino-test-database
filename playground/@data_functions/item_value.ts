@@ -29,4 +29,5 @@ export async function remove(
 	await db.delete(itemValue).where(inArray(itemValue.id, item_value_ids));
 }
 
-export type { DataInsert as btt_infer_insert, DataSelect as btt_infer_select };
+export type { DataInsert as infer_insert, DataSelect as infer_select };
+

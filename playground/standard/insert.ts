@@ -26,13 +26,13 @@ import {
 } from "@playground/utils";
 
 interface DataType {
-	description: btt.btt_infer_insert["description"];
-	cashflow_type: btt.btt_infer_insert["cashflow_type"];
-	category_id: btt.btt_infer_insert["fk_id_category"];
-	transaction_instrument_id: ti.btt_infer_select["id"];
-	transfer_method_code: tm.btt_infer_select["code"];
-	amount: iv.btt_infer_insert["amount"];
-	scheduled_at: iv.btt_infer_insert["scheduled_at"];
+	description: btt.infer_insert["description"];
+	cashflow_type: btt.infer_insert["cashflow_type"];
+	category_id: btt.infer_insert["fk_id_category"];
+	transaction_instrument_id: ti.infer_select["id"];
+	transfer_method_code: tm.infer_select["code"];
+	amount: iv.infer_insert["amount"];
+	scheduled_at: iv.infer_insert["scheduled_at"];
 }
 
 const insert = async (data: DataType) => {
@@ -92,35 +92,34 @@ const insert = async (data: DataType) => {
 };
 
 async function main() {
+	// ESCOLHENDO TRANSFER_METHOD
 	const transfer_methods = await tm.get_all(db);
 	const indexTM = getRandomIndex(transfer_methods.length); // Adicionar lógica interativa
 	const method_choose = transfer_methods[indexTM];
 	console.log({ transfer_methods, indexTM, method_choose });
 
+	// ESCOLHENDO TRANSACTION_INSTRUMENT
 	const transaction_instruments = await ti.get_all_filtered_by_transfer_method(
 		db,
 		method_choose.code
 	);
 	const indexTI = getRandomIndex(transaction_instruments.length); // Adicionar lógica interativa
 	const selected_transaction_instrument = transaction_instruments[indexTI];
-
 	console.log({
 		transaction_instruments,
 		indexTI,
 		selected_transaction_instrument,
 	});
 
+	// ESCOLHENDO CATEGORY
 	const categories = await cat.get_all(db);
 	const indexC = getRandomIndex(categories.length); // Adicionar lógica interativa
 	const selected_category = categories[indexC];
 	console.log({ categories, indexC, selected_category });
 
 	const description = "Minha descrição de teste"; // Adicionar lógica interativa
-
 	const cashflow_type = getCashflowType(); // Adicionar lógica interativa
-
 	const scheduled_at = getRandomFutureDate(getRandomIntegerBetween(0, 120));
-
 	const amount = getRandomIntegerBetween(5, 100_000);
 
 	await insert({

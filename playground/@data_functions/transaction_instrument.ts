@@ -40,5 +40,4 @@ export async function get_bank_id(
 	return bank_id;
 }
 
-export type { DataInsert as btt_infer_insert, DataSelect as btt_infer_select };
-
+export type { DataInsert as infer_insert, DataSelect as infer_select };

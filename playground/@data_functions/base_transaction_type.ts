@@ -26,5 +26,5 @@ export async function remove(
 		.where(eq(baseTransactionType.id, base_transaction_id));
 }
 
-export type { DataInsert as btt_infer_insert, DataSelect as btt_infer_select };
+export type { DataInsert as infer_insert, DataSelect as infer_select };
 
