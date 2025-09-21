@@ -31,6 +31,8 @@ interface DataType {
 	category_id: btt.btt_infer_insert["fk_id_category"];
 	transaction_instrument_id: ti.btt_infer_select["id"];
 	transfer_method_code: tm.btt_infer_select["code"];
+	amount: iv.btt_infer_insert["amount"];
+	scheduled_at: iv.btt_infer_insert["scheduled_at"];
 }
 
 const insert = async (data: DataType) => {
@@ -42,8 +44,8 @@ const insert = async (data: DataType) => {
 	});
 
 	const [item_value] = await iv.insert(db, {
-		scheduled_at: getRandomFutureDate(getRandomIntegerBetween(0, 120)),
-		amount: getRandomIntegerBetween(5, 100_000),
+		scheduled_at: data.scheduled_at,
+		amount: data.amount,
 	});
 
 	await std.insert(db, {
@@ -115,14 +117,20 @@ async function main() {
 
 	const description = "Minha descrição de teste"; // Adicionar lógica interativa
 
-	// 1.5. Sortear o cashflow_type (-1 = saída, 1 = entrada)
 	const cashflow_type = getCashflowType(); // Adicionar lógica interativa
+
+	const scheduled_at = getRandomFutureDate(getRandomIntegerBetween(0, 120));
+
+	const amount = getRandomIntegerBetween(5, 100_000);
+
 	await insert({
 		description,
 		cashflow_type,
 		category_id: selected_category.id,
 		transaction_instrument_id: selected_transaction_instrument.id,
 		transfer_method_code: selected_transaction_instrument.code,
+		amount,
+		scheduled_at,
 	});
 }
 
