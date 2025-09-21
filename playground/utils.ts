@@ -1,5 +1,5 @@
 export function getRealAmountValue(
-	cashflow_type: -1 | 1,
+	cashflow_type: Cashflow_Type,
 	amount: number,
 	inverse: boolean = false
 ) {
@@ -9,7 +9,7 @@ export function getRealAmountValue(
 }
 
 // Sortear o cashflow_type (-1 = saída, 1 = entrada)
-export function getCashflowType(): -1 | 1 {
+export function getCashflowType(): Cashflow_Type {
 	return Math.random() > 0.5 ? -1 : 1;
 }
 

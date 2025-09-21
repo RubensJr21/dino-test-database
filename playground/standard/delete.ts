@@ -1,10 +1,6 @@
 /*
 -- ======================
 -- TABELA: standard
--- OBS:
---   > As seguintes tabelas precisam ter dados:
---     - transaction_instrument 
---     - category
 -- ======================
 */
 

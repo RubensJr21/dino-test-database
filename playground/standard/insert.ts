@@ -3,6 +3,7 @@
 -- TABELA: standard
 -- OBS:
 --   > As seguintes tabelas precisam ter dados:
+--     - transfer_method
 --     - transaction_instrument 
 --     - category
 -- ======================

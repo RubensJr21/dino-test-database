@@ -46,7 +46,7 @@ export const transactionInstrument = sqliteTable("transaction_instrument", {
 export const baseTransactionType = sqliteTable("base_transaction_type", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	description: text("description").notNull(),
-	cashflow_type: integer("cashflow_type").$type< -1 | 1>().notNull(), // 0=Entrada, 1=Saída
+	cashflow_type: integer("cashflow_type").$type<Cashflow_Type>().notNull(),
 	fk_id_transaction_instrument: integer("fk_id_transaction_instrument")
 		.notNull()
 		.references(() => transactionInstrument.id),

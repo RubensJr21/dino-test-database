@@ -4,8 +4,7 @@ import { and, eq } from "drizzle-orm";
 
 type DataType = Pick<typeof balanceBank.$inferInsert, "month" | "year"> & {
 	amount: typeof itemValue.$inferInsert.amount;
-	cashflow_type: typeof baseTransactionType.$inferSelect.cashflow_type &
-		(-1 | 1);
+	cashflow_type: typeof baseTransactionType.$inferSelect.cashflow_type;
 	bank_id: typeof balanceBank.$inferInsert.fk_id_bank_account;
 };
 

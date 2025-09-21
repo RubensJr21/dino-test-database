@@ -5,8 +5,7 @@ import { and, eq } from "drizzle-orm";
 
 type DataType = Pick<typeof balanceCash.$inferInsert, "month" | "year"> & {
 	amount: typeof itemValue.$inferInsert.amount;
-	cashflow_type: typeof baseTransactionType.$inferSelect.cashflow_type &
-		(-1 | 1);
+	cashflow_type: typeof baseTransactionType.$inferSelect.cashflow_type;
 };
 
 export async function add_amount(db: DatabaseType, data: DataType) {
