@@ -27,7 +27,7 @@ export function getRandomIndex(size: number) {
 	return getRandomIntegerBetween(0, size);
 }
 
-export function getRandomFutureDate(daysAhead = 30) {
+export function getRandomFutureDate(daysAhead = 0) {
 	const today = new Date();
 
 	// gera número aleatório de dias no intervalo [0, daysAhead]
