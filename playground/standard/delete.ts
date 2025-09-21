@@ -17,9 +17,9 @@ import { db } from "@database/db-instance";
 import { standard } from "@database/schema";
 import { eq } from "drizzle-orm";
 
-(async () => {
+const remove = async (standard_id: typeof standard.$inferSelect.id) => {
 	// 1. Recuperar standard que será removido
-	const standard_for_delete = await std.get(db, 1);
+	const standard_for_delete = await std.get(db, standard_id);
 	if (standard_for_delete === undefined) {
 		throw new Error("standard_id inexistente.");
 	}
@@ -38,7 +38,7 @@ import { eq } from "drizzle-orm";
 		month,
 		year,
 		amount: standard_for_delete.amount,
-		cashflow_type: standard_for_delete.cashflow_type as -1 | 1,
+		cashflow_type: standard_for_delete.cashflow_type,
 	};
 
 	if (standard_for_delete.transfer_method_code === "cash") {
@@ -65,4 +65,9 @@ import { eq } from "drizzle-orm";
 	}
 
 	console.log("standard removido!");
-})();
+};
+
+async function main() {
+	const standard_id_for_delete = 1;
+	remove(standard_id_for_delete);
+}

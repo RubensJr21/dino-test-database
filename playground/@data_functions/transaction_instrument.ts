@@ -2,6 +2,9 @@ import { type DatabaseType } from "@database/db-instance";
 import { transactionInstrument, transferMethod } from "@database/schema";
 import { and, eq } from "drizzle-orm";
 
+type DataInsert = typeof transactionInstrument.$inferInsert;
+type DataSelect = typeof transactionInstrument.$inferSelect;
+
 export async function get_all_filtered_by_transfer_method(
 	db: DatabaseType,
 	method_code: typeof transferMethod.$inferSelect.code
@@ -36,3 +39,6 @@ export async function get_bank_id(
 		.where(eq(transactionInstrument.id, transaction_instrument_id));
 	return bank_id;
 }
+
+export type { DataInsert as btt_infer_insert, DataSelect as btt_infer_select };
+

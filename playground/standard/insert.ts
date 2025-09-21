@@ -24,7 +24,71 @@ import {
 	getRandomIntegerBetween,
 } from "@playground/utils";
 
-(async () => {
+interface DataType {
+	description: btt.btt_infer_insert["description"];
+	cashflow_type: btt.btt_infer_insert["cashflow_type"];
+	category_id: btt.btt_infer_insert["fk_id_category"];
+	transaction_instrument_id: ti.btt_infer_select["id"];
+	transfer_method_code: tm.btt_infer_select["code"];
+}
+
+const insert = async (data: DataType) => {
+	const base_transaction_type = await btt.insert(db, {
+		description: data.description,
+		cashflow_type: data.cashflow_type,
+		fk_id_category: data.category_id,
+		fk_id_transaction_instrument: data.transaction_instrument_id,
+	});
+
+	const [item_value] = await iv.insert(db, {
+		scheduled_at: getRandomFutureDate(getRandomIntegerBetween(0, 120)),
+		amount: getRandomIntegerBetween(5, 100_000),
+	});
+
+	await std.insert(db, {
+		id: base_transaction_type[0].id,
+		fk_id_item_value: item_value.id,
+	});
+
+	// ======================================
+	// POST INSERT
+	// ======================================
+	const month = item_value.scheduled_at.getMonth();
+	const year = item_value.scheduled_at.getFullYear();
+
+	// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
+	if (data.transfer_method_code === "cash") {
+		// inserir no balanço de balance_cash
+		await bc.add_amount(db, {
+			month,
+			year,
+			amount: item_value.amount,
+			cashflow_type: data.cashflow_type,
+		});
+	} else {
+		// Verificar se já existe
+		// Garanto que existe, pois ele não é do tipo 'cash'
+		const bank_id = await ti.get_bank_id(db, data.transaction_instrument_id);
+
+		if (bank_id === null) {
+			throw new Error(`Erro ao obter o valor de bank_id (${bank_id})`);
+		}
+
+		console.log("bank_id:", bank_id);
+
+		await bb.add_amount(db, {
+			month,
+			year,
+			amount: item_value.amount,
+			bank_id,
+			cashflow_type: data.cashflow_type,
+		});
+	}
+
+	console.log("standard inserido!");
+};
+
+async function main() {
 	const transfer_methods = await tm.get_all(db);
 	const indexTM = getRandomIndex(transfer_methods.length); // Adicionar lógica interativa
 	const method_choose = transfer_methods[indexTM];
@@ -52,62 +116,13 @@ import {
 
 	// 1.5. Sortear o cashflow_type (-1 = saída, 1 = entrada)
 	const cashflow_type = getCashflowType(); // Adicionar lógica interativa
-
-	const base_transaction_type = await btt.insert(db, {
+	await insert({
 		description,
 		cashflow_type,
-		fk_id_category: selected_category.id,
-		fk_id_transaction_instrument: selected_transaction_instrument.id,
+		category_id: selected_category.id,
+		transaction_instrument_id: selected_transaction_instrument.id,
+		transfer_method_code: selected_transaction_instrument.code,
 	});
+}
 
-	const [item_value] = await iv.insert(db, {
-		scheduled_at: getRandomFutureDate(getRandomIntegerBetween(0, 120)),
-		amount: getRandomIntegerBetween(5, 100_000),
-	});
-
-	await std.insert(db, {
-		id: base_transaction_type[0].id,
-		fk_id_item_value: item_value.id,
-	});
-
-	// ======================================
-	// POST INSERT
-	// ======================================
-	const month = item_value.scheduled_at.getMonth();
-	const year = item_value.scheduled_at.getFullYear();
-
-	// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
-	if (selected_transaction_instrument.code === "cash") {
-		// inserir no balanço de balance_cash
-		await bc.add_amount(db, {
-			month,
-			year,
-			amount: item_value.amount,
-			cashflow_type: cashflow_type,
-		});
-	} else {
-		// Verificar se já existe
-		// Garanto que existe, pois ele não é do tipo 'cash'
-		const bank_id = await ti.get_bank_id(
-			db,
-			selected_transaction_instrument.id
-		);
-
-		if (bank_id === null) {
-			console.log({ selected_transaction_instrument });
-			throw new Error(`Erro ao obter o valor de bank_id (${bank_id})`);
-		}
-
-		console.log("bank_id:", bank_id);
-
-		await bb.add_amount(db, {
-			month,
-			year,
-			amount: item_value.amount,
-			bank_id,
-			cashflow_type: cashflow_type,
-		});
-	}
-
-	console.log("standard inserido!");
-})();
+main();
