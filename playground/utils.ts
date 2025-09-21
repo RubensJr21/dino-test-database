@@ -39,3 +39,14 @@ export function getRandomFutureDate(daysAhead = 0) {
 
 	return result;
 }
+
+export function getRandomRangeDate() {
+	const start_date = getRandomFutureDate();
+	const shouldHaveEndDate = Math.random() > 0.75;
+	return {
+		start_date,
+		end_date: shouldHaveEndDate
+			? getRandomFutureDate(start_date.getDate() + 60)
+			: null,
+	};
+}
