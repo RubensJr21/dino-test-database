@@ -38,6 +38,20 @@ export async function add_amount(
 		.where(eq(balanceCash.id, data.id));
 }
 
+
+export async function apply_executed_amount(
+  db: DatabaseType,
+  data: {
+    id: typeof balanceCash.$inferSelect.id;
+    updated_executed_amount: typeof balanceCash.$inferSelect.executed_amount;
+  }
+) {
+  await db
+    .update(balanceCash)
+    .set({ executed_amount: data.updated_executed_amount })
+    .where(eq(balanceCash.id, data.id));
+}
+
 export async function get_balance(
 	db: DatabaseType,
 	data: Pick<DataType, "month" | "year">

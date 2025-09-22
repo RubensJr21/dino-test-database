@@ -39,6 +39,19 @@ export async function add_amount(
 		.where(eq(balanceBank.id, data.id));
 }
 
+export async function apply_executed_amount(
+	db: DatabaseType,
+	data: {
+		id: typeof balanceBank.$inferSelect.id;
+		updated_executed_amount: typeof balanceBank.$inferSelect.executed_amount;
+	}
+) {
+	await db
+		.update(balanceBank)
+		.set({ executed_amount: data.updated_executed_amount })
+		.where(eq(balanceBank.id, data.id));
+}
+
 export async function get_balance(
 	db: DatabaseType,
 	data: Pick<DataType, "bank_id" | "month" | "year">
@@ -68,15 +81,15 @@ export async function remove_amount_processed(
 	db: DatabaseType,
 	data: {
 		balance_id: typeof balanceBank.$inferSelect.id;
-		updated_planned_ammount: typeof balanceBank.$inferSelect.planned_amount;
-		updated_executed_ammount: typeof balanceBank.$inferSelect.executed_amount;
+		updated_planned_amount: typeof balanceBank.$inferSelect.planned_amount;
+		updated_executed_amount: typeof balanceBank.$inferSelect.executed_amount;
 	}
 ) {
 	await db
 		.update(balanceBank)
 		.set({
-			planned_amount: data.updated_planned_ammount,
-			executed_amount: data.updated_executed_ammount,
+			planned_amount: data.updated_planned_amount,
+			executed_amount: data.updated_executed_amount,
 		})
 		.where(eq(balanceBank.id, data.balance_id));
 }
@@ -85,13 +98,13 @@ export async function remove_amount_unprocessed(
 	db: DatabaseType,
 	data: {
 		balance_id: typeof balanceBank.$inferSelect.id;
-		updated_planned_ammount: typeof balanceBank.$inferSelect.planned_amount;
+		updated_planned_amount: typeof balanceBank.$inferSelect.planned_amount;
 	}
 ) {
 	await db
 		.update(balanceBank)
 		.set({
-			planned_amount: data.updated_planned_ammount,
+			planned_amount: data.updated_planned_amount,
 		})
 		.where(eq(balanceBank.id, data.balance_id));
 }
