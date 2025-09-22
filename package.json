@@ -12,7 +12,9 @@
     "predatabase:reset": "npm run database:clean && npm run database:push",
     "database:reset": "ts-node -r tsconfig-paths/register @database/create",
     
-    "database:clean": "ts-node -r tsconfig-paths/register @database/clean"
+    "database:clean": "ts-node -r tsconfig-paths/register @database/clean",
+    
+    "ts-check": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
