@@ -13,7 +13,7 @@ export function drawCashflowType(): Cashflow_Type {
 	return Math.random() > 0.5 ? -1 : 1;
 }
 
-export function getRandomFloatBetween(min: number, max: number) {
+export function randomFloatBetween(min: number, max: number) {
 	return Math.random() * (max - min) + min;
 }
 
