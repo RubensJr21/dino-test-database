@@ -21,10 +21,10 @@ import * as ti from "@data_functions/transaction_instrument";
 import * as tm from "@data_functions/transfer_method";
 import { db } from "@database/db-instance";
 import {
-  getCashflowType,
-  getRandomIndex,
-  getRandomIntegerBetween,
-  getRandomRangeDate,
+    drawCashflowType,
+    getRandomIndex,
+    getRandomIntegerBetween,
+    getRandomRangeDate,
 } from "@playground/utils";
 
 interface DataType {
@@ -138,7 +138,7 @@ async function main() {
 	console.log({ recurrence_types, indexRT, selected_recurrence_type });
 
 	const description = "Minha descrição de teste"; // Adicionar lógica interativa
-	const cashflow_type = getCashflowType(); // Adicionar lógica interativa
+	const cashflow_type = drawCashflowType(); // Adicionar lógica interativa
 
 	const rangeDate = getRandomRangeDate();
 

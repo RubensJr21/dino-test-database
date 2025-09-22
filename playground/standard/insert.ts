@@ -19,10 +19,10 @@ import * as ti from "@data_functions/transaction_instrument";
 import * as tm from "@data_functions/transfer_method";
 import { db } from "@database/db-instance";
 import {
-	getCashflowType,
-	getRandomFutureDate,
-	getRandomIndex,
-	getRandomIntegerBetween,
+    drawCashflowType,
+    getRandomFutureDate,
+    getRandomIndex,
+    getRandomIntegerBetween,
 } from "@playground/utils";
 
 interface DataType {
@@ -118,7 +118,7 @@ async function main() {
 	console.log({ categories, indexC, selected_category });
 
 	const description = "Minha descrição de teste"; // Adicionar lógica interativa
-	const cashflow_type = getCashflowType(); // Adicionar lógica interativa
+	const cashflow_type = drawCashflowType(); // Adicionar lógica interativa
 	const scheduled_at = getRandomFutureDate(getRandomIntegerBetween(0, 120));
 	const amount = getRandomIntegerBetween(5, 100_000);
 
