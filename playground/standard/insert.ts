@@ -20,6 +20,7 @@ import * as tm from "@data_functions/transfer_method";
 import { db } from "@database/db-instance";
 import {
   drawCashflowType,
+  getRealAmountValue,
   randomFutureDate,
   randomIndex,
   randomIntBetween,
@@ -59,17 +60,27 @@ const insert = async (data: DataType) => {
 	const month = item_value.scheduled_at.getMonth();
 	const year = item_value.scheduled_at.getFullYear();
 
+	const realAmount = getRealAmountValue(data.cashflow_type, item_value.amount);
+
 	// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
 	if (data.transfer_method_code === "cash") {
-		// inserir no balanço de balance_cash
-		await bc.add_amount(db, {
+		const balance_cash = await bc.get_balance(db, {
 			month,
 			year,
-			amount: item_value.amount,
-			cashflow_type: data.cashflow_type,
+		});
+
+		if (balance_cash === undefined) {
+			throw new Error(
+				`Erro ao obter o valor de balance_cash (${balance_cash})`
+			);
+		}
+
+		// inserir no balanço de balance_cash
+		await bc.add_amount(db, {
+			id: balance_cash.id,
+			updated_planned_amount: balance_cash.planned_amount + realAmount,
 		});
 	} else {
-		// Verificar se já existe
 		// Garanto que existe, pois ele não é do tipo 'cash'
 		const bank_id = await ti.get_bank_id(db, data.transaction_instrument_id);
 
@@ -79,12 +90,21 @@ const insert = async (data: DataType) => {
 
 		console.log("bank_id:", bank_id);
 
-		await bb.add_amount(db, {
+		const balance_bank = await bb.get_balance(db, {
 			month,
 			year,
-			amount: item_value.amount,
 			bank_id,
-			cashflow_type: data.cashflow_type,
+		});
+
+		if (balance_bank === undefined) {
+			throw new Error(
+				`Erro ao obter o valor de balance_bank (${balance_bank})`
+			);
+		}
+
+		await bb.add_amount(db, {
+			id: balance_bank.id,
+			updated_planned_amount: balance_bank.planned_amount + realAmount,
 		});
 	}
 
