@@ -10,8 +10,7 @@
 -- ======================
 */
 
-import * as bb from "@data_functions/balance_bank";
-import * as bc from "@data_functions/balance_cash";
+import * as bip from "@data_functions/balance_insert_pipeline";
 import * as btt from "@data_functions/base_transaction_type";
 import * as cat from "@data_functions/category";
 import * as iv from "@data_functions/item_value";
@@ -78,48 +77,19 @@ const insert = async (data: DataType) => {
 
 	// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
 	if (data.transfer_method_code === "cash") {
-		const balance_cash = await bc.get_balance(db, {
+		bip.balance_cash_insert_pipeline(db, {
 			month,
 			year,
-		});
-
-		if (balance_cash === undefined) {
-			throw new Error(
-				`Erro ao obter o valor de balance_cash (${balance_cash})`
-			);
-		}
-
-		// inserir no balanço de balance_cash
-		await bc.add_amount(db, {
-			id: balance_cash.id,
-			updated_planned_amount: balance_cash.planned_amount + realAmount,
+			cashflow_type: data.cashflow_type,
+			amount: item_value.amount,
 		});
 	} else {
-		// Verificar se já existe
-		// Garanto que existe, pois ele não é do tipo 'cash'
-		const bank_id = await ti.get_bank_id(db, data.transaction_instrument_id);
-
-		if (bank_id === null) {
-			throw new Error(`Erro ao obter o valor de bank_id (${bank_id})`);
-		}
-
-		console.log("bank_id:", bank_id);
-
-		const balance_bank = await bb.get_balance(db, {
+		bip.balance_bank_insert_pipeline(db, {
 			month,
 			year,
-			bank_id,
-		});
-
-		if (balance_bank === undefined) {
-			throw new Error(
-				`Erro ao obter o valor de balance_bank (${balance_bank})`
-			);
-		}
-
-		await bb.add_amount(db, {
-			id: balance_bank.id,
-			updated_planned_amount: balance_bank.planned_amount + realAmount,
+			cashflow_type: data.cashflow_type,
+			amount: item_value.amount,
+			transaction_instrument_id: data.transaction_instrument_id,
 		});
 	}
 

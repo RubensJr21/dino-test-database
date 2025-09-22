@@ -1,12 +1,11 @@
 import { type DatabaseType } from "@database/db-instance";
-import { balanceCash, baseTransactionType, itemValue } from "@database/schema";
+import { balanceCash, itemValue } from "@database/schema";
 import { and, eq } from "drizzle-orm";
 
 type DataType = {
 	month: typeof balanceCash.$inferSelect.month;
 	year: typeof balanceCash.$inferSelect.year;
 	amount: typeof itemValue.$inferInsert.amount;
-	cashflow_type: typeof baseTransactionType.$inferSelect.cashflow_type;
 };
 
 export async function create_balance(db: DatabaseType, data: DataType) {
