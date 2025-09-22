@@ -44,7 +44,10 @@ export async function add_amount(db: DatabaseType, data: DataType) {
 	}
 }
 
-async function get_balance_bank(db: DatabaseType, data: DataType) {
+export async function get_balance(
+	db: DatabaseType,
+	data: Pick<DataType, "bank_id" | "month" | "year">
+) {
 	return (
 		await db
 			.select()
@@ -59,43 +62,41 @@ async function get_balance_bank(db: DatabaseType, data: DataType) {
 	).shift();
 }
 
+export async function remove_balance(
+	db: DatabaseType,
+	balance_id: typeof balanceBank.$inferSelect.id
+) {
+	await db.delete(balanceBank).where(eq(balanceBank.id, balance_id));
+}
+
 export async function remove_amount_processed(
 	db: DatabaseType,
-	data: DataType
+	data: {
+    balance_id: typeof balanceBank.$inferSelect.id;
+		updated_planned_ammount: typeof balanceBank.$inferSelect.planned_amount;
+		updated_executed_ammount: typeof balanceBank.$inferSelect.executed_amount;
+	},
 ) {
-	const balance_bank = await get_balance_bank(db, data);
-
-	if (balance_bank === undefined) {
-		throw new Error(
-			"Nenhum balanço desta conta bancária foi encontrado para o período especificado."
-		);
-	}
-
 	await db
 		.update(balanceBank)
 		.set({
-			planned_amount: balance_bank.planned_amount + data.amount,
-			executed_amount: balance_bank.executed_amount + data.amount,
+			planned_amount: data.updated_planned_ammount,
+			executed_amount: data.updated_executed_ammount,
 		})
-		.where(eq(balanceBank.id, balance_bank.id));
+		.where(eq(balanceBank.id, data.balance_id));
 }
 
 export async function remove_amount_unprocessed(
 	db: DatabaseType,
-	data: DataType
+	data: {
+    balance_id: typeof balanceBank.$inferSelect.id;
+		updated_planned_ammount: typeof balanceBank.$inferSelect.planned_amount;
+	},
 ) {
-	const balance_bank = await get_balance_bank(db, data);
-
-	if (balance_bank === undefined) {
-		throw new Error(
-			"Nenhum balanço desta conta bancária foi encontrado para o período especificado."
-		);
-	}
-
 	await db
 		.update(balanceBank)
 		.set({
-			planned_amount: balance_bank.planned_amount + data.amount,
+			planned_amount: data.updated_planned_ammount,
 		})
-		.where(eq(balanceBank.id, balance_bank.id));
+		.where(eq(balanceBank.id, data.balance_id));
 }

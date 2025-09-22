@@ -11,6 +11,7 @@ import * as iv from "@data_functions/item_value";
 import * as rec from "@data_functions/recurring";
 import { db } from "@database/db-instance";
 import { recurring } from "@database/schema";
+import { getRealAmountValue } from "@playground/utils";
 
 const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
 	const recurring_for_delete = await rec.get(db, recurring_id);
@@ -49,33 +50,64 @@ const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
 		const month = item_value.scheduled_at.getMonth();
 		const year = item_value.scheduled_at.getFullYear();
 
-		const data = {
-			month,
-			year,
-			amount: item_value.amount,
-			cashflow_type: item_value.cashflow_type,
-		};
+		const realAmount = getRealAmountValue(
+			item_value.cashflow_type,
+			item_value.amount,
+			true
+		);
 
 		if (item_value.transfer_method_code === "cash") {
+			const balance_cash = await bc.get_balance(db, {
+				month,
+				year,
+			});
+
+			if (balance_cash === undefined) {
+				throw new Error(
+					"Nenhum balanço de dineiro foi encontrado para o período especificado."
+				);
+			}
+
 			// remover do balanço de balance_cash
 			if (item_value.was_processed) {
-				await bc.remove_amount_processed(db, data);
+				await bc.remove_amount_processed(db, {
+					balance_id: balance_cash.id,
+					updated_planned_ammount: balance_cash.planned_amount + realAmount,
+					updated_executed_ammount: balance_cash.executed_amount + realAmount,
+				});
 			} else {
-				await bc.remove_amount_unprocessed(db, data);
+				await bc.remove_amount_unprocessed(db, {
+					balance_id: balance_cash.id,
+					updated_planned_ammount: balance_cash.planned_amount + realAmount,
+				});
 			}
 		} else {
 			// Garanto que existe, pois ele não é do tipo 'cash'
 			const bank_id = item_value.bank_account_id!;
 
-			const data_with_bank_id = {
-				...data,
+			const balance_bank = await bb.get_balance(db, {
 				bank_id,
-			};
+				month,
+				year,
+			});
+
+			if (balance_bank === undefined) {
+				throw new Error(
+					"Nenhum balanço desta conta bancária foi encontrado para o período especificado."
+				);
+			}
 
 			if (item_value.was_processed) {
-				await bb.remove_amount_processed(db, data_with_bank_id);
+				await bb.remove_amount_processed(db, {
+					balance_id: balance_bank.id,
+					updated_planned_ammount: balance_bank.planned_amount + realAmount,
+					updated_executed_ammount: balance_bank.executed_amount + realAmount,
+				});
 			} else {
-				await bb.remove_amount_unprocessed(db, data_with_bank_id);
+				await bb.remove_amount_unprocessed(db, {
+					balance_id: balance_bank.id,
+					updated_planned_ammount: balance_bank.planned_amount + realAmount,
+				});
 			}
 		}
 	});

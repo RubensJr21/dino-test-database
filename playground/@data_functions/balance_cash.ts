@@ -43,54 +43,54 @@ export async function add_amount(db: DatabaseType, data: DataType) {
 	}
 }
 
+export async function get_balance(
+	db: DatabaseType,
+	data: Pick<DataType, "month" | "year">
+) {
+	return (
+		await db
+			.select()
+			.from(balanceCash)
+			.where(
+				and(eq(balanceCash.year, data.year), eq(balanceCash.month, data.month))
+			)
+	).shift();
+}
+
+export async function remove_balance(
+	db: DatabaseType,
+	balance_id: typeof balanceCash.$inferSelect.id
+) {
+	await db.delete(balanceCash).where(eq(balanceCash.id, balance_id));
+}
+
 export async function remove_amount_processed(
 	db: DatabaseType,
-	data: DataType
-) {
-	// considero que já existe
-	const [balance_cash] = await db
-		.select()
-		.from(balanceCash)
-		.where(
-			and(eq(balanceCash.year, data.year), eq(balanceCash.month, data.month))
-		);
-
-	if (balance_cash === undefined) {
-		throw new Error(
-			"Nenhum balanço de dinheiro foi encontrado para o período especificado."
-		);
+	data: {
+		balance_id: typeof balanceCash.$inferSelect.id;
+		updated_planned_ammount: typeof balanceCash.$inferSelect.planned_amount;
+		updated_executed_ammount: typeof balanceCash.$inferSelect.executed_amount;
 	}
-
+) {
 	await db
 		.update(balanceCash)
 		.set({
-			planned_amount: balance_cash.planned_amount + data.amount,
-			executed_amount: balance_cash.executed_amount + data.amount,
+			planned_amount: data.updated_planned_ammount,
+			executed_amount: data.updated_executed_ammount,
 		})
-		.where(eq(balanceCash.id, balance_cash.id));
+		.where(eq(balanceCash.id, data.balance_id));
 }
 export async function remove_amount_unprocessed(
 	db: DatabaseType,
-	data: DataType
-) {
-	// considero que já existe
-	const [balance_cash] = await db
-		.select()
-		.from(balanceCash)
-		.where(
-			and(eq(balanceCash.year, data.year), eq(balanceCash.month, data.month))
-		);
-
-	if (balance_cash === undefined) {
-		throw new Error(
-			"Nenhum balanço de dinheiro foi encontrado para o período especificado."
-		);
+	data: {
+		balance_id: typeof balanceCash.$inferSelect.id;
+		updated_planned_ammount: typeof balanceCash.$inferSelect.planned_amount;
 	}
-
+) {
 	await db
 		.update(balanceCash)
 		.set({
-			planned_amount: balance_cash.planned_amount + data.amount,
+			planned_amount: data.updated_planned_ammount,
 		})
-		.where(eq(balanceCash.id, balance_cash.id));
+		.where(eq(balanceCash.id, data.balance_id));
 }
