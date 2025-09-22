@@ -22,8 +22,8 @@ import * as tm from "@data_functions/transfer_method";
 import { db } from "@database/db-instance";
 import {
   drawCashflowType,
-  getRandomIndex,
   getRandomRangeDate,
+  randomIndex,
   randomIntBetween,
 } from "@playground/utils";
 
@@ -108,7 +108,7 @@ const insert = async (data: DataType) => {
 async function main() {
 	// ESCOLHENDO TRANSFER_METHOD
 	const transfer_methods = await tm.get_all(db);
-	const indexTM = getRandomIndex(transfer_methods.length); // Adicionar lógica interativa
+	const indexTM = randomIndex(transfer_methods.length); // Adicionar lógica interativa
 	const method_choose = transfer_methods[indexTM];
 	console.log({ transfer_methods, indexTM, method_choose });
 
@@ -117,7 +117,7 @@ async function main() {
 		db,
 		method_choose.code
 	);
-	const indexTI = getRandomIndex(transaction_instruments.length); // Adicionar lógica interativa
+	const indexTI = randomIndex(transaction_instruments.length); // Adicionar lógica interativa
 	const selected_transaction_instrument = transaction_instruments[indexTI];
 	console.log({
 		transaction_instruments,
@@ -127,13 +127,13 @@ async function main() {
 
 	// ESCOLHENDO CATEGORY
 	const categories = await cat.get_all(db);
-	const indexC = getRandomIndex(categories.length); // Adicionar lógica interativa
+	const indexC = randomIndex(categories.length); // Adicionar lógica interativa
 	const selected_category = categories[indexC];
 	console.log({ categories, indexC, selected_category });
 
 	// ESCOLHENDO RECURRENCE_TYPE
 	const recurrence_types = await rt.get_all(db);
-	const indexRT = getRandomIndex(recurrence_types.length); // Adicionar lógica interativa
+	const indexRT = randomIndex(recurrence_types.length); // Adicionar lógica interativa
 	const selected_recurrence_type = recurrence_types[indexRT];
 	console.log({ recurrence_types, indexRT, selected_recurrence_type });
 

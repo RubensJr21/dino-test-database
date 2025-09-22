@@ -23,7 +23,7 @@ export function randomIntBetween(min: number, max: number) {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
 
-export function getRandomIndex(size: number) {
+export function randomIndex(size: number) {
 	return randomIntBetween(0, size);
 }
 
