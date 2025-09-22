@@ -21,10 +21,10 @@ import * as ti from "@data_functions/transaction_instrument";
 import * as tm from "@data_functions/transfer_method";
 import { db } from "@database/db-instance";
 import {
-    drawCashflowType,
-    getRandomIndex,
-    getRandomIntegerBetween,
-    getRandomRangeDate,
+  drawCashflowType,
+  getRandomIndex,
+  getRandomRangeDate,
+  randomIntBetween,
 } from "@playground/utils";
 
 interface DataType {
@@ -142,7 +142,7 @@ async function main() {
 
 	const rangeDate = getRandomRangeDate();
 
-	const amount = getRandomIntegerBetween(5, 100_000);
+	const amount = randomIntBetween(5, 100_000);
 
 	await insert({
 		description,

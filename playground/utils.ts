@@ -17,14 +17,14 @@ export function randomFloatBetween(min: number, max: number) {
 	return Math.random() * (max - min) + min;
 }
 
-export function getRandomIntegerBetween(min: number, max: number) {
+export function randomIntBetween(min: number, max: number) {
 	min = Math.ceil(min); // Ensure min is rounded up
 	max = Math.floor(max); // Ensure max is rounded down
 	return Math.floor(Math.random() * (max - min)) + min;
 }
 
 export function getRandomIndex(size: number) {
-	return getRandomIntegerBetween(0, size);
+	return randomIntBetween(0, size);
 }
 
 export function getRandomFutureDate(daysAhead = 0) {

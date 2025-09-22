@@ -1,11 +1,11 @@
-import { getRandomIntegerBetween } from "@playground/utils";
+import { randomIntBetween } from "@playground/utils";
 import { db } from "./db-instance";
 import {
-	bankAccount,
-	category,
-	recurrenceType,
-	transactionInstrument,
-	transferMethod,
+  bankAccount,
+  category,
+  recurrenceType,
+  transactionInstrument,
+  transferMethod,
 } from "./schema";
 
 (async () => {
@@ -54,7 +54,7 @@ export async function populate_initial_tests_values(
 
 	const transfer_methods = await database.select().from(transferMethod);
 
-	const NUMBERS_OF_TI = getRandomIntegerBetween(2, 15);
+	const NUMBERS_OF_TI = randomIntBetween(2, 15);
 	console.log({ NUMBERS_OF_TI });
 	for (let i = 0; i < NUMBERS_OF_TI; i++) {
 		// Selecionar método de transferência
