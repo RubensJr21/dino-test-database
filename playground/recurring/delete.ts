@@ -51,7 +51,7 @@ const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
 		const year = item_value.scheduled_at.getFullYear();
 
 		const realAmount = getRealAmountValue(
-			item_value.cashflow_type,
+			recurring_for_delete.cashflow_type,
 			item_value.amount,
 			true
 		);
