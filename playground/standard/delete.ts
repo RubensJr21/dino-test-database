@@ -11,7 +11,6 @@ import * as iv from "@data_functions/item_value";
 import * as std from "@data_functions/standard";
 import { db } from "@database/db-instance";
 import { standard } from "@database/schema";
-import { eq } from "drizzle-orm";
 
 const remove = async (standard_id: typeof standard.$inferSelect.id) => {
 	// 1. Recuperar standard que será removido
@@ -20,7 +19,7 @@ const remove = async (standard_id: typeof standard.$inferSelect.id) => {
 		throw new Error("standard_id inexistente.");
 	}
 
-	await db.delete(standard).where(eq(standard.id, standard_for_delete.id));
+	await std.remove(db, standard_for_delete.id);
 	await btt.remove(db, standard_for_delete.id);
 	await iv.remove(db, [standard_for_delete.item_value_id]);
 
@@ -68,4 +67,4 @@ async function main() {
 	remove(standard_id_for_delete);
 }
 
-main()
+main();

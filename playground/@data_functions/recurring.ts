@@ -1,12 +1,12 @@
 import { type DatabaseType } from "@database/db-instance";
 import {
-	baseTransactionType,
-	itemValue,
-	recurrenceType,
-	recurring,
-	recurringItemValue,
-	transactionInstrument,
-	transferMethod,
+  baseTransactionType,
+  itemValue,
+  recurrenceType,
+  recurring,
+  recurringItemValue,
+  transactionInstrument,
+  transferMethod,
 } from "@database/schema";
 import { eq } from "drizzle-orm";
 

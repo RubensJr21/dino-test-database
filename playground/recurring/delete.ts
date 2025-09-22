@@ -11,7 +11,6 @@ import * as iv from "@data_functions/item_value";
 import * as rec from "@data_functions/recurring";
 import { db } from "@database/db-instance";
 import { recurring } from "@database/schema";
-import { eq } from "drizzle-orm";
 
 const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
 	const recurring_for_delete = await rec.get(db, recurring_id);
@@ -19,7 +18,7 @@ const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
 		throw new Error("recurring_id inexistente.");
 	}
 
-	await db.delete(recurring).where(eq(recurring.id, recurring_for_delete.id));
+	await rec.remove(db, recurring_for_delete.id);
 	await btt.remove(db, recurring_for_delete.id);
 
 	// Para cada item
@@ -80,7 +79,7 @@ const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
 			}
 		}
 	});
-  console.log("recurring removido!");
+	console.log("recurring removido!");
 };
 
 async function main() {
