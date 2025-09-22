@@ -22,9 +22,9 @@ import * as tm from "@data_functions/transfer_method";
 import { db } from "@database/db-instance";
 import {
   drawCashflowType,
-  getRandomRangeDate,
   randomIndex,
   randomIntBetween,
+  randomRangeDate,
 } from "@playground/utils";
 
 interface DataType {
@@ -140,7 +140,7 @@ async function main() {
 	const description = "Minha descrição de teste"; // Adicionar lógica interativa
 	const cashflow_type = drawCashflowType(); // Adicionar lógica interativa
 
-	const rangeDate = getRandomRangeDate();
+	const rangeDate = randomRangeDate();
 
 	const amount = randomIntBetween(5, 100_000);
 

@@ -40,7 +40,7 @@ export function randomFutureDate(daysAhead = 0) {
 	return result;
 }
 
-export function getRandomRangeDate() {
+export function randomRangeDate() {
 	const start_date = randomFutureDate();
 	const shouldHaveEndDate = Math.random() > 0.75;
 	return {
