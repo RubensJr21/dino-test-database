@@ -4,11 +4,15 @@
   "main": "index.js",
   "scripts": {
     "playground": "cd ./playground/ && ts-node -r tsconfig-paths/register",
+    
+    "database:push": "drizzle-kit --config drizzle.config.ts push",
     "database:start": "ts-node -r tsconfig-paths/register @database/create",
+    "database:build": "npm run database:push && npm run database:start",
+    
     "predatabase:reset": "npm run database:clean && npm run database:push",
     "database:reset": "ts-node -r tsconfig-paths/register @database/create",
-    "database:clean": "ts-node -r tsconfig-paths/register @database/clean",
-    "database:push": "drizzle-kit --config drizzle.config.ts push"
+    
+    "database:clean": "ts-node -r tsconfig-paths/register @database/clean"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +28,6 @@
   "dependencies": {
     "better-sqlite3": "^12.2.0",
     "drizzle-orm": "^0.44.5",
-    "knex": "^3.1.0",
     "ts-node": "^10.9.2"
   }
 }
