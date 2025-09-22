@@ -27,7 +27,7 @@ export function randomIndex(size: number) {
 	return randomIntBetween(0, size);
 }
 
-export function getRandomFutureDate(daysAhead = 0) {
+export function randomFutureDate(daysAhead = 0) {
 	const today = new Date();
 
 	// gera número aleatório de dias no intervalo [0, daysAhead]
@@ -41,12 +41,12 @@ export function getRandomFutureDate(daysAhead = 0) {
 }
 
 export function getRandomRangeDate() {
-	const start_date = getRandomFutureDate();
+	const start_date = randomFutureDate();
 	const shouldHaveEndDate = Math.random() > 0.75;
 	return {
 		start_date,
 		end_date: shouldHaveEndDate
-			? getRandomFutureDate(start_date.getDate() + 60)
+			? randomFutureDate(start_date.getDate() + 60)
 			: null,
 	};
 }
