@@ -35,9 +35,9 @@ export const transactionInstrument = sqliteTable("transaction_instrument", {
 	fk_id_bank_account: integer("fk_id_bank_account").references(
 		() => bankAccount.id
 	),
-	is_enabled: integer("is_enabled", { mode: "boolean" })
-		.notNull()
-		.default(true),
+	// is_enabled: integer("is_enabled", { mode: "boolean" })
+	// 	.notNull()
+	// 	.default(true),
 });
 
 // ======================

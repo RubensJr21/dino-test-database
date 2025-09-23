@@ -21,8 +21,7 @@ export async function get_all_filtered_by_transfer_method(
 		)
 		.where(
 			and(
-				eq(transferMethod.code, method_code),
-				eq(transactionInstrument.is_enabled, true)
+				eq(transferMethod.code, method_code)
 			)
 		);
 }
@@ -41,3 +40,4 @@ export async function get_bank_id(
 }
 
 export type { DataInsert as infer_insert, DataSelect as infer_select };
+
