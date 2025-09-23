@@ -56,12 +56,8 @@ export async function get(
 	).shift();
 }
 
-export async function insert(
-	db: DatabaseType,
-	data: DataInsert
-) {
-	// Feito assim para permitir a inserção de vários ou apenas 1
-  return await db.insert(recurring).values(data).returning();
+export async function insert(db: DatabaseType, data: DataInsert) {
+	return await db.insert(recurring).values(data).returning();
 }
 
 export async function register_item_value(
@@ -161,6 +157,19 @@ export async function remove(
 	recurring_id: typeof recurring.$inferSelect.id
 ) {
 	await db.delete(recurring).where(eq(recurring.id, recurring_id));
+}
+
+export async function enable(
+	db: DatabaseType,
+	data: {
+		id: typeof recurring.$inferSelect.id;
+		start_date: typeof recurring.$inferSelect.start_date;
+	}
+) {
+	await db
+		.update(recurring)
+		.set({ start_date: data.start_date, end_date: null })
+		.where(eq(recurring.id, data.id));
 }
 
 export type { DataInsert as infer_insert, DataSelect as infer_select };
