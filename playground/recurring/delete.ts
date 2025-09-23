@@ -72,13 +72,13 @@ const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
 			if (item_value.was_processed) {
 				await bc.remove_amount_processed(db, {
 					balance_id: balance_cash.id,
-					updated_planned_ammount: balance_cash.planned_amount + realAmount,
-					updated_executed_ammount: balance_cash.executed_amount + realAmount,
+					updated_planned_amount: balance_cash.planned_amount + realAmount,
+					updated_executed_amount: balance_cash.executed_amount + realAmount,
 				});
 			} else {
 				await bc.remove_amount_unprocessed(db, {
 					balance_id: balance_cash.id,
-					updated_planned_ammount: balance_cash.planned_amount + realAmount,
+					updated_planned_amount: balance_cash.planned_amount + realAmount,
 				});
 			}
 		} else {
@@ -100,13 +100,13 @@ const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
 			if (item_value.was_processed) {
 				await bb.remove_amount_processed(db, {
 					balance_id: balance_bank.id,
-					updated_planned_ammount: balance_bank.planned_amount + realAmount,
-					updated_executed_ammount: balance_bank.executed_amount + realAmount,
+					updated_planned_amount: balance_bank.planned_amount + realAmount,
+					updated_executed_amount: balance_bank.executed_amount + realAmount,
 				});
 			} else {
 				await bb.remove_amount_unprocessed(db, {
 					balance_id: balance_bank.id,
-					updated_planned_ammount: balance_bank.planned_amount + realAmount,
+					updated_planned_amount: balance_bank.planned_amount + realAmount,
 				});
 			}
 		}

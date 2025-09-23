@@ -1,10 +1,10 @@
 import { type DatabaseType } from "@database/db-instance";
 import {
-	baseTransactionType,
-	itemValue,
-	standard,
-	transactionInstrument,
-	transferMethod,
+  baseTransactionType,
+  itemValue,
+  standard,
+  transactionInstrument,
+  transferMethod,
 } from "@database/schema";
 import { eq } from "drizzle-orm";
 
@@ -49,13 +49,8 @@ export async function get(
 	).shift();
 }
 
-export async function insert(db: DatabaseType, data: Data | Data[]) {
-	// Feito assim para permitir a inserção de vários ou apenas 1
-	if (Array.isArray(data)) {
-		return await db.insert(standard).values(data).returning();
-	} else {
-		return await db.insert(standard).values(data).returning();
-	}
+export async function insert(db: DatabaseType, data: Data) {
+	return await db.insert(standard).values(data).returning()
 }
 
 export async function remove(

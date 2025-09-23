@@ -77,15 +77,15 @@ export async function remove_amount_processed(
 	db: DatabaseType,
 	data: {
 		balance_id: typeof balanceCash.$inferSelect.id;
-		updated_planned_ammount: typeof balanceCash.$inferSelect.planned_amount;
-		updated_executed_ammount: typeof balanceCash.$inferSelect.executed_amount;
+		updated_planned_amount: typeof balanceCash.$inferSelect.planned_amount;
+		updated_executed_amount: typeof balanceCash.$inferSelect.executed_amount;
 	}
 ) {
 	await db
 		.update(balanceCash)
 		.set({
-			planned_amount: data.updated_planned_ammount,
-			executed_amount: data.updated_executed_ammount,
+			planned_amount: data.updated_planned_amount,
+			executed_amount: data.updated_executed_amount,
 		})
 		.where(eq(balanceCash.id, data.balance_id));
 }
@@ -93,13 +93,13 @@ export async function remove_amount_unprocessed(
 	db: DatabaseType,
 	data: {
 		balance_id: typeof balanceCash.$inferSelect.id;
-		updated_planned_ammount: typeof balanceCash.$inferSelect.planned_amount;
+		updated_planned_amount: typeof balanceCash.$inferSelect.planned_amount;
 	}
 ) {
 	await db
 		.update(balanceCash)
 		.set({
-			planned_amount: data.updated_planned_ammount,
+			planned_amount: data.updated_planned_amount,
 		})
 		.where(eq(balanceCash.id, data.balance_id));
 }

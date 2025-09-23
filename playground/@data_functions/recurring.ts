@@ -58,14 +58,10 @@ export async function get(
 
 export async function insert(
 	db: DatabaseType,
-	data: DataInsert | DataInsert[]
+	data: DataInsert
 ) {
 	// Feito assim para permitir a inserção de vários ou apenas 1
-	if (Array.isArray(data)) {
-		return await db.insert(recurring).values(data).returning();
-	} else {
-		return await db.insert(recurring).values(data).returning();
-	}
+  return await db.insert(recurring).values(data).returning();
 }
 
 export async function register_item_value(
