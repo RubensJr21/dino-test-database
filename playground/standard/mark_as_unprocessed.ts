@@ -23,28 +23,22 @@ export async function mark_as_processed(
 
 	const month = standard_founded.scheduled_at.getMonth();
 	const year = standard_founded.scheduled_at.getFullYear();
+	const data = {
+		month,
+		year,
+		amount: standard_founded.amount,
+		cashflow_type: standard_founded.cashflow_type,
+	};
 
 	if (standard_founded.transfer_method_code === "cash") {
 		// Fluxo do dinheiro
-		bup.balance_cash_update_pipeline(
-			db,
-			{
-				month,
-				year,
-				amount: standard_founded.amount,
-				cashflow_type: standard_founded.cashflow_type,
-			},
-			false
-		);
+		bup.balance_cash_update_pipeline(db, data, false);
 	} else {
 		// Fluxo do banco
 		bup.balance_bank_update_pipeline(
 			db,
 			{
-				month,
-				year,
-				amount: standard_founded.amount,
-				cashflow_type: standard_founded.cashflow_type,
+				...data,
 				transaction_instrument_id: standard_founded.transaction_instrument_id,
 			},
 			false
