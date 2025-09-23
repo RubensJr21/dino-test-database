@@ -21,3 +21,5 @@ export async function update_nickname(
 		.set({ nickname: data.nickname })
 		.where(eq(bankAccount.id, data.bank_id));
 }
+
+export type { DataInsert as infer_insert, DataSelect as infer_select };
