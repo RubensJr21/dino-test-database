@@ -1,6 +1,6 @@
 import { type DatabaseType } from "@database/db-instance";
 import { transactionInstrument, transferMethod } from "@database/schema";
-import { and, eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 type DataInsert = typeof transactionInstrument.$inferInsert;
 type DataSelect = typeof transactionInstrument.$inferSelect;
@@ -19,11 +19,7 @@ export async function get_all_filtered_by_transfer_method(
 			transferMethod,
 			eq(transactionInstrument.fk_id_transfer_method, transferMethod.id)
 		)
-		.where(
-			and(
-				eq(transferMethod.code, method_code)
-			)
-		);
+		.where(eq(transferMethod.code, method_code));
 }
 
 export async function get_bank_id(
@@ -39,16 +35,36 @@ export async function get_bank_id(
 	return bank_id;
 }
 
-export async function register_transafer_methods(
-  db: DatabaseType,
-  data: DataInsert | DataInsert[]
+export async function register_transfer_methods(
+	db: DatabaseType,
+	data: DataInsert | DataInsert[]
 ) {
-  // Feito assim para permitir a inserção de vários ou apenas 1
-  if (Array.isArray(data)) {
-    return await db.insert(transactionInstrument).values(data).returning();
-  } else {
-    return await db.insert(transactionInstrument).values(data).returning();
-  }
+	// Feito assim para permitir a inserção de vários ou apenas 1
+	if (Array.isArray(data)) {
+		return await db.insert(transactionInstrument).values(data).returning();
+	} else {
+		return await db.insert(transactionInstrument).values(data).returning();
+	}
+}
+
+type TransactionInstrumentId = typeof transactionInstrument.$inferSelect.id;
+
+export async function delete_transfer_methods(
+	db: DatabaseType,
+	data: TransactionInstrumentId | TransactionInstrumentId[]
+) {
+	// Feito assim para permitir a inserção de vários ou apenas 1
+	if (Array.isArray(data)) {
+		return await db
+			.delete(transactionInstrument)
+			.where(inArray(transactionInstrument.id, data))
+			.returning();
+	} else {
+		return await db
+			.delete(transactionInstrument)
+			.where(eq(transactionInstrument.id, data))
+			.returning();
+	}
 }
 
 export type { DataInsert as infer_insert, DataSelect as infer_select };

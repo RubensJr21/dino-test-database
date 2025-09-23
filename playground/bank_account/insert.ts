@@ -42,7 +42,7 @@ export async function insertBankAccount(
 		);
 	}
 
-	await ti.register_transafer_methods(
+	await ti.register_transfer_methods(
 		db,
 		transfer_methods.map((transfer_method) => ({
 			fk_id_transfer_method: transfer_method.id,
