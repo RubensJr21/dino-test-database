@@ -3,56 +3,72 @@ import * as ti from "@data_functions/transaction_instrument";
 import * as tm from "@data_functions/transfer_method";
 import { db } from "@database/db-instance";
 
+function allCodesFounded<T, U>(vec_one: T[], vec_two: U[]) {
+	return vec_one.length === vec_two.length;
+}
+
+function hasCodeToInsert<T>(vec: T[]) {
+	return vec.length > 0;
+}
+function hasCodeToDisable<T>(vec: T[]) {
+	return vec.length > 0;
+}
+
 export async function insertBankAccount(
-	bank_id: ba.infer_select["id"],
-	new_nickname: ba.infer_select["nickname"],
-	methods_enable: tm.infer_select["code"][]
+  data: {
+    id: ba.infer_select["id"],
+    new_nickname?: ba.infer_select["nickname"],
+    methods_enable: tm.infer_select["code"][]
+  }
 ) {
-	if (methods_enable.length === 0) {
+	if (data.methods_enable.length === 0) {
 		throw new Error(
 			"É necessário informar pelo menos 1 método de transferência"
 		);
 	}
 
-	const bank_account = await ba.get(db, bank_id);
+	const bank_account = await ba.get(db, data.id);
 
 	if (bank_account === undefined) {
 		throw new Error("Nenhuma conta bancária foi encontrada para esse id.");
 	}
 
+	// Os métodos de transferência obtidos serão comparados com os recebidos
 	const transaction_instruments = await ba.get_all_transaction_instruments(
 		db,
 		bank_account.id
 	);
 
-	const methods_enable_set = new Set(methods_enable);
-	const transaction_instrument_for_delete = transaction_instruments.filter(
+	// Aqueles que estiverem cadastrados mas não estiverem na lista recebida serão desabilitados
+	const methods_enable_set = new Set(data.methods_enable);
+	const transaction_instrument_for_disable = transaction_instruments.filter(
 		(transaction_instrument) => {
 			return !methods_enable_set.has(transaction_instrument.code);
 		}
 	);
 
-	const methods_for_insert = methods_enable.filter((method) => {
-		const index = transaction_instruments.findIndex(({ code }) => {
-			return code === method;
-		});
-		return index !== -1;
-	});
-
-	if (transaction_instrument_for_delete.length > 0) {
-		await ti.delete_transfer_methods(
+	if (hasCodeToDisable(transaction_instrument_for_disable)) {
+		await ti.disable_transfer_methods(
 			db,
-			transaction_instrument_for_delete.map(({ id }) => id)
+			transaction_instrument_for_disable.map(({ id }) => id)
 		);
 	}
 
-	if (methods_for_insert.length > 0) {
+	// Aqueles que não estiverem cadastrados ainda serão verificados e inseridos se tudo estiver correto
+	const methods_for_insert = data.methods_enable.filter((method) => {
+		const index = transaction_instruments.findIndex(({ code }) => {
+			return code === method;
+		});
+		return index === -1;
+	});
+
+	if (hasCodeToInsert(methods_for_insert)) {
 		const transfer_methods = await tm.get_all_filtered_by_codes(
 			db,
 			methods_for_insert
 		);
 
-		if (transfer_methods.length !== methods_for_insert.length) {
+		if (allCodesFounded(transfer_methods, methods_for_insert)) {
 			const invalids_method_codes = tm.diff_method_codes(
 				transfer_methods,
 				methods_for_insert
@@ -71,8 +87,10 @@ export async function insertBankAccount(
 		);
 	}
 
-	await ba.update_nickname(db, {
-		bank_id,
-		nickname: new_nickname,
-	});
+  if(data.new_nickname !== undefined && data.new_nickname !== bank_account.nickname){
+    await ba.update_nickname(db, {
+      bank_id: bank_account.id,
+      nickname: data.new_nickname,
+    });
+  }
 }

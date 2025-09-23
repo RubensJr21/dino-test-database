@@ -32,6 +32,7 @@ Table transaction_instrument {
   id integer [pk, increment]
   fk_id_transfer_method integer [not null, ref: > transfer_method.id]
   fk_id_bank_account integer [ref: > bank_account.id]
+  is_enabled bool [not null, default: "true"]
 } 
 /*
   HERANÇA DE TABELA DE CLASSESUntitled-1
