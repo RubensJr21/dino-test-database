@@ -39,5 +39,17 @@ export async function get_bank_id(
 	return bank_id;
 }
 
+export async function register_transafer_methods(
+  db: DatabaseType,
+  data: DataInsert | DataInsert[]
+) {
+  // Feito assim para permitir a inserção de vários ou apenas 1
+  if (Array.isArray(data)) {
+    return await db.insert(transactionInstrument).values(data).returning();
+  } else {
+    return await db.insert(transactionInstrument).values(data).returning();
+  }
+}
+
 export type { DataInsert as infer_insert, DataSelect as infer_select };
 

@@ -6,7 +6,7 @@ type DataInsert = typeof bankAccount.$inferInsert;
 type DataSelect = typeof bankAccount.$inferSelect;
 
 export async function insert(db: DatabaseType, data: DataInsert) {
-	return await db.insert(bankAccount).values(data).returning();
+	return (await db.insert(bankAccount).values(data).returning()).shift();
 }
 
 export async function update_nickname(
