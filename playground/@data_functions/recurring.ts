@@ -8,7 +8,7 @@ import {
   transactionInstrument,
   transferMethod,
 } from "@database/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 type DataInsert = typeof recurring.$inferInsert;
 type DataSelect = typeof recurring.$inferSelect;
@@ -74,6 +74,7 @@ export async function register_item_value(
 ) {
 	return await db.insert(recurringItemValue).values(data).returning();
 }
+
 export async function get_all_item_values(
 	db: DatabaseType,
 	recurring_id: typeof recurring.$inferSelect.id
@@ -111,6 +112,54 @@ export async function get_all_item_values(
 		);
 }
 
+export async function get_item_value(
+	db: DatabaseType,
+	recurring_id: typeof recurring.$inferSelect.id,
+	item_value_id: typeof itemValue.$inferSelect.id
+) {
+	return (
+		await db
+			.select({
+				id: itemValue.id,
+				scheduled_at: itemValue.scheduled_at,
+				amount: itemValue.amount,
+				was_processed: itemValue.was_processed,
+
+				cashflow_type: baseTransactionType.cashflow_type,
+
+				bank_account_id: transactionInstrument.fk_id_bank_account,
+
+				transfer_method_code: transferMethod.code,
+			})
+			.from(recurringItemValue)
+			.where(
+				and(
+					eq(recurringItemValue.fk_id_recurring, recurring_id),
+					eq(itemValue.id, item_value_id)
+				)
+			)
+			.innerJoin(
+				itemValue,
+				eq(recurringItemValue.fk_id_item_value, itemValue.id)
+			)
+			.innerJoin(
+				baseTransactionType,
+				eq(recurringItemValue.fk_id_recurring, baseTransactionType.id)
+			)
+			.innerJoin(
+				transactionInstrument,
+				eq(
+					transactionInstrument.id,
+					baseTransactionType.fk_id_transaction_instrument
+				)
+			)
+			.innerJoin(
+				transferMethod,
+				eq(transferMethod.id, transactionInstrument.fk_id_transfer_method)
+			)
+	).shift();
+}
+
 export async function remove(
 	db: DatabaseType,
 	recurring_id: typeof recurring.$inferSelect.id
@@ -119,3 +168,4 @@ export async function remove(
 }
 
 export type { DataInsert as infer_insert, DataSelect as infer_select };
+
