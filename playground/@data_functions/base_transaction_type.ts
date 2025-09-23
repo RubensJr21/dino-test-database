@@ -26,5 +26,19 @@ export async function remove(
 		.where(eq(baseTransactionType.id, base_transaction_id));
 }
 
+export async function update(
+	db: DatabaseType,
+	base_transaction_id: typeof baseTransactionType.$inferSelect.id,
+	data: {
+		description?: DataInsert["description"];
+		fk_id_category?: DataInsert["fk_id_category"];
+	}
+) {
+	await db
+		.update(baseTransactionType)
+		.set(data)
+		.where(eq(baseTransactionType.id, base_transaction_id));
+}
+
 export type { DataInsert as infer_insert, DataSelect as infer_select };
 

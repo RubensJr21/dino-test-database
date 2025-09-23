@@ -8,11 +8,12 @@ import {
 } from "@database/schema";
 import { eq } from "drizzle-orm";
 
-type Data = typeof standard.$inferInsert;
+type DataInsert = typeof standard.$inferInsert;
+type DataSelect = typeof standard.$inferSelect;
 
 export async function get(
 	db: DatabaseType,
-	standard_id: typeof standard.$inferSelect.id
+	standard_id: DataSelect["id"]
 ) {
 	return (
 		await db
@@ -49,13 +50,15 @@ export async function get(
 	).shift();
 }
 
-export async function insert(db: DatabaseType, data: Data) {
+export async function insert(db: DatabaseType, data: DataInsert) {
 	return await db.insert(standard).values(data).returning()
 }
 
 export async function remove(
 	db: DatabaseType,
-	standard_id: typeof standard.$inferSelect.id
+	standard_id: DataSelect["id"]
 ) {
 	await db.delete(standard).where(eq(standard.id, standard_id));
 }
+
+export type { DataInsert as infer_insert, DataSelect as infer_select };
