@@ -17,7 +17,7 @@ import * as iv from "@data_functions/item_value";
 import * as rt from "@data_functions/recurrence_type";
 import * as ti from "@data_functions/transaction_instrument";
 import * as tm from "@data_functions/transfer_method";
-import { db } from "@database/db-instance";
+import { db, transactionsFn } from "@database/db-instance";
 import {
   drawCashflowType,
   randomIndex,
@@ -41,75 +41,82 @@ interface DataType {
 }
 
 const insert = async (data: DataType) => {
-	const base_transaction_type = await btt.insert(db, {
-		description: data.description,
-		cashflow_type: data.cashflow_type,
-		fk_id_category: data.category_id,
-		fk_id_transaction_instrument: data.transaction_instrument_id,
-	});
-
-	const [installment] = await imt.insert(db, {
-		id: base_transaction_type[0].id,
-		start_date: data.start_date,
-		installments_number: data.installments_number,
-		total_amount: data.total_amount,
-	});
-
-	const scheduled_at = data.start_date;
-
-	const items_values: Array<{
-		item_value_id: number;
-		month: number;
-		year: number;
-	}> = [];
-
-	const installments = imt.calculate_installments(
-		data.total_amount,
-		data.installments_number
-	);
-
-	for (let i = 0; i < data.installments_number; i++) {
-		const [item_value] = await iv.insert(db, {
-			scheduled_at,
-			// Fazendo assim o primeiro item terá o valor dele
-			// E para as execuções seguintes o valor ficará fixado em 1 (posição 2)
-			amount: installments[Math.min(i, 1)],
+	transactionsFn.beginTransaction();
+	try {
+		const base_transaction_type = await btt.insert(db, {
+			description: data.description,
+			cashflow_type: data.cashflow_type,
+			fk_id_category: data.category_id,
+			fk_id_transaction_instrument: data.transaction_instrument_id,
 		});
 
-		await imt.register_item_value(db, {
-			fk_id_installment: installment.id,
-			fk_id_item_value: item_value.id,
-		});
-		const month = item_value.scheduled_at.getMonth();
-		const year = item_value.scheduled_at.getFullYear();
-
-		items_values.push({
-			item_value_id: item_value.id,
-			month,
-			year,
+		const [installment] = await imt.insert(db, {
+			id: base_transaction_type[0].id,
+			start_date: data.start_date,
+			installments_number: data.installments_number,
+			total_amount: data.total_amount,
 		});
 
-		// ======================================
-		// POST INSERT
-		// ======================================
-		// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
-		if (data.transfer_method_code === "cash") {
-			bip.balance_cash_insert_pipeline(db, {
+		const scheduled_at = data.start_date;
+
+		const items_values: Array<{
+			item_value_id: number;
+			month: number;
+			year: number;
+		}> = [];
+
+		const installments = imt.calculate_installments(
+			data.total_amount,
+			data.installments_number
+		);
+
+		for (let i = 0; i < data.installments_number; i++) {
+			const [item_value] = await iv.insert(db, {
+				scheduled_at,
+				// Fazendo assim o primeiro item terá o valor dele
+				// E para as execuções seguintes o valor ficará fixado em 1 (posição 2)
+				amount: installments[Math.min(i, 1)],
+			});
+
+			await imt.register_item_value(db, {
+				fk_id_installment: installment.id,
+				fk_id_item_value: item_value.id,
+			});
+			const month = item_value.scheduled_at.getMonth();
+			const year = item_value.scheduled_at.getFullYear();
+
+			items_values.push({
+				item_value_id: item_value.id,
 				month,
 				year,
-				cashflow_type: data.cashflow_type,
-				amount: item_value.amount,
 			});
-		} else {
-			bip.balance_bank_insert_pipeline(db, {
-				month,
-				year,
-				cashflow_type: data.cashflow_type,
-				amount: item_value.amount,
-				transaction_instrument_id: data.transaction_instrument_id,
-			});
+
+			// ======================================
+			// POST INSERT
+			// ======================================
+			// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
+			if (data.transfer_method_code === "cash") {
+				bip.balance_cash_insert_pipeline(db, {
+					month,
+					year,
+					cashflow_type: data.cashflow_type,
+					amount: item_value.amount,
+				});
+			} else {
+				bip.balance_bank_insert_pipeline(db, {
+					month,
+					year,
+					cashflow_type: data.cashflow_type,
+					amount: item_value.amount,
+					transaction_instrument_id: data.transaction_instrument_id,
+				});
+			}
+			console.log("installment inserido!");
 		}
-		console.log("installment inserido!");
+		transactionsFn.commitTransaction();
+	} catch (error) {
+		transactionsFn.rollbackTransaction();
+		throw error;
 	}
 };
 
