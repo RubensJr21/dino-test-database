@@ -10,7 +10,7 @@ export async function update(
 		category?: cat.infer_insert["code"];
 	}
 ) {
-	transactionsFn.beginTransaction();
+	transactionsFn.begin();
 	try {
 		const installment_founded = await imt.get(db, installment_id);
 		if (installment_founded === undefined) {
@@ -47,10 +47,10 @@ export async function update(
 		) {
 			await btt.update(db, installment_founded.id, updates);
 		}
-		transactionsFn.commitTransaction();
+		transactionsFn.commit();
 		console.log("installment atualizado!");
 	} catch (error) {
-		transactionsFn.rollbackTransaction();
+		transactionsFn.rollback();
 		throw error;
 	}
 }

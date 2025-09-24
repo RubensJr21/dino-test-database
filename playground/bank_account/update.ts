@@ -19,7 +19,7 @@ export async function insertBankAccount(data: {
 	new_nickname?: ba.infer_select["nickname"];
 	methods_enable: tm.infer_select["code"][];
 }) {
-  transactionsFn.beginTransaction();
+  transactionsFn.begin();
 	try {
 		if (data.methods_enable.length === 0) {
 			throw new Error(
@@ -99,9 +99,9 @@ export async function insertBankAccount(data: {
 			});
 		}
 
-    transactionsFn.commitTransaction();
+    transactionsFn.commit();
 	} catch (error) {
-    transactionsFn.rollbackTransaction();
+    transactionsFn.rollback();
 		throw error;
 	}
 }

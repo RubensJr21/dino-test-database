@@ -7,7 +7,7 @@ import { standard } from "@database/schema";
 export async function mark_as_processed(
 	standard_id: typeof standard.$inferSelect.id
 ) {
-	transactionsFn.beginTransaction();
+	transactionsFn.begin();
 	try {
 		const standard_founded = await std.get(db, standard_id);
 		if (standard_founded === undefined) {
@@ -46,9 +46,9 @@ export async function mark_as_processed(
 				false
 			);
 		}
-		transactionsFn.commitTransaction();
+		transactionsFn.commit();
 	} catch (error) {
-		transactionsFn.rollbackTransaction();
+		transactionsFn.rollback();
 		throw error;
 	}
 }

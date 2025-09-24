@@ -10,7 +10,7 @@ export async function update(
 		category?: cat.infer_insert["code"];
 	}
 ) {
-	transactionsFn.beginTransaction();
+	transactionsFn.begin();
 	try {
 		const standard_founded = await std.get(db, standard_id);
 		if (standard_founded === undefined) {
@@ -48,10 +48,10 @@ export async function update(
 			await btt.update(db, standard_founded.id, updates);
 		}
 
-		transactionsFn.commitTransaction();
+		transactionsFn.commit();
 		console.log("standard atualizado!");
 	} catch (error) {
-		transactionsFn.rollbackTransaction();
+		transactionsFn.rollback();
 		throw error;
 	}
 }

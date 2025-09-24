@@ -14,7 +14,7 @@ import { recurring } from "@database/schema";
 import { getRealAmountValue } from "@playground/utils";
 
 const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
-	transactionsFn.beginTransaction();
+	transactionsFn.begin();
 	try {
 		const recurring_for_delete = await rec.get(db, recurring_id);
 		if (recurring_for_delete === undefined) {
@@ -114,9 +114,9 @@ const remove = async (recurring_id: typeof recurring.$inferSelect.id) => {
 			}
 		});
 		console.log("recurring removido!");
-		transactionsFn.commitTransaction();
+		transactionsFn.commit();
 	} catch (error) {
-		transactionsFn.rollbackTransaction();
+		transactionsFn.rollback();
 		throw error;
 	}
 };

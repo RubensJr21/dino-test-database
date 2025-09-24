@@ -22,7 +22,7 @@ function rollbackTransaction() {
 }
 
 export const transactionsFn = {
-	beginTransaction,
-	commitTransaction,
-	rollbackTransaction,
+	begin: beginTransaction,
+	commit: commitTransaction,
+	rollback: rollbackTransaction,
 };

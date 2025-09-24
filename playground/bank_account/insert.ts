@@ -7,7 +7,7 @@ export async function insertBankAccount(
 	nickname: ba.infer_insert["nickname"],
 	methods_enable: tm.infer_select["code"][]
 ) {
-  transactionsFn.beginTransaction();
+  transactionsFn.begin();
   try {
     if (methods_enable.length === 0) {
       throw new Error(
@@ -51,9 +51,9 @@ export async function insertBankAccount(
         fk_id_bank_account: bank_account.id,
       }))
     );
-    transactionsFn.commitTransaction();
+    transactionsFn.commit();
   } catch (error) {
-    transactionsFn.rollbackTransaction();
+    transactionsFn.rollback();
     throw error;
   }
 }

@@ -8,7 +8,7 @@ export async function mark_item_value_as_processed(
 	installment_id: typeof installment.$inferSelect.id,
 	item_value_id: typeof itemValue.$inferSelect.id
 ) {
-	transactionsFn.beginTransaction();
+	transactionsFn.begin();
 	try {
 		const installment_founded = await imt.get(db, installment_id);
 		if (installment_founded === undefined) {
@@ -52,9 +52,9 @@ export async function mark_item_value_as_processed(
 					installment_founded.transaction_instrument_id,
 			});
 		}
-		transactionsFn.commitTransaction();
+		transactionsFn.commit();
 	} catch (error) {
-		transactionsFn.rollbackTransaction();
+		transactionsFn.rollback();
 		throw error;
 	}
 }

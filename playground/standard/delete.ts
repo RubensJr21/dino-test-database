@@ -14,7 +14,7 @@ import { standard } from "@database/schema";
 import { getRealAmountValue } from "@playground/utils";
 
 const remove = async (standard_id: typeof standard.$inferSelect.id) => {
-	transactionsFn.beginTransaction();
+	transactionsFn.begin();
 	try {
 		// 1. Recuperar standard que será removido
 		const standard_for_delete = await std.get(db, standard_id);
@@ -93,10 +93,10 @@ const remove = async (standard_id: typeof standard.$inferSelect.id) => {
 			}
 		}
 
-		transactionsFn.commitTransaction();
+		transactionsFn.commit();
 		console.log("standard removido!");
 	} catch (error) {
-		transactionsFn.rollbackTransaction();
+		transactionsFn.rollback();
 		throw error;
 	}
 };

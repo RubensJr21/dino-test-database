@@ -14,7 +14,7 @@ import { installment } from "@database/schema";
 import { getRealAmountValue } from "@playground/utils";
 
 const remove = async (installment_id: typeof installment.$inferSelect.id) => {
-	transactionsFn.beginTransaction();
+	transactionsFn.begin();
 	try {
 		const installment_for_delete = await imt.get(db, installment_id);
 		if (installment_for_delete === undefined) {
@@ -113,10 +113,10 @@ const remove = async (installment_id: typeof installment.$inferSelect.id) => {
 				}
 			}
 		});
-		transactionsFn.commitTransaction();
+		transactionsFn.commit();
 		console.log("installment removido!");
 	} catch (error) {
-		transactionsFn.rollbackTransaction();
+		transactionsFn.rollback();
 		throw error;
 	}
 };

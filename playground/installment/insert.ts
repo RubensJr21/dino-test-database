@@ -41,7 +41,7 @@ interface DataType {
 }
 
 const insert = async (data: DataType) => {
-	transactionsFn.beginTransaction();
+	transactionsFn.begin();
 	try {
 		const base_transaction_type = await btt.insert(db, {
 			description: data.description,
@@ -113,9 +113,9 @@ const insert = async (data: DataType) => {
 			}
 			console.log("installment inserido!");
 		}
-		transactionsFn.commitTransaction();
+		transactionsFn.commit();
 	} catch (error) {
-		transactionsFn.rollbackTransaction();
+		transactionsFn.rollback();
 		throw error;
 	}
 };

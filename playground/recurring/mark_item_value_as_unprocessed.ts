@@ -8,7 +8,7 @@ export async function mark_item_value_as_processed(
 	recurring_id: typeof recurring.$inferSelect.id,
 	item_value_id: typeof itemValue.$inferSelect.id
 ) {
-  transactionsFn.beginTransaction();
+  transactionsFn.begin();
 	try {
     const recurring_founded = await rec.get(db, recurring_id);
     	if (recurring_founded === undefined) {
@@ -58,9 +58,9 @@ export async function mark_item_value_as_processed(
     			true
     		);
     	}
-      transactionsFn.commitTransaction()
+      transactionsFn.commit()
   } catch (error) {
-    transactionsFn.rollbackTransaction()
+    transactionsFn.rollback()
     throw error;
   }
 }
