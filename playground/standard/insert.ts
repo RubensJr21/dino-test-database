@@ -16,7 +16,7 @@ import * as iv from "@data_functions/item_value";
 import * as std from "@data_functions/standard";
 import * as ti from "@data_functions/transaction_instrument";
 import * as tm from "@data_functions/transfer_method";
-import { db } from "@database/db-instance";
+import { db, transactionsFn } from "@database/db-instance";
 import {
   drawCashflowType,
   randomFutureDate,
@@ -35,48 +35,57 @@ interface DataType {
 }
 
 const insert = async (data: DataType) => {
-	const base_transaction_type = await btt.insert(db, {
-		description: data.description,
-		cashflow_type: data.cashflow_type,
-		fk_id_category: data.category_id,
-		fk_id_transaction_instrument: data.transaction_instrument_id,
-	});
+  transactionsFn.beginTransaction();
+	try {
+    const base_transaction_type = await btt.insert(db, {
+    		description: data.description,
+    		cashflow_type: data.cashflow_type,
+    		fk_id_category: data.category_id,
+    		fk_id_transaction_instrument: data.transaction_instrument_id,
+    	});
+    
+    	const [item_value] = await iv.insert(db, {
+    		scheduled_at: data.scheduled_at,
+    		amount: data.amount,
+    	});
+    
+    	await std.insert(db, {
+    		id: base_transaction_type[0].id,
+    		fk_id_item_value: item_value.id,
+    	});
+    
+    	// ======================================
+    	// POST INSERT
+    	// ======================================
+    	const month = item_value.scheduled_at.getMonth();
+    	const year = item_value.scheduled_at.getFullYear();
+    
+    	// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
+    	if (data.transfer_method_code === "cash") {
+    		bip.balance_cash_insert_pipeline(db, {
+    			month,
+    			year,
+    			cashflow_type: data.cashflow_type,
+    			amount: item_value.amount,
+    		});
+    	} else {
+    		bip.balance_bank_insert_pipeline(db, {
+    			month,
+    			year,
+    			cashflow_type: data.cashflow_type,
+    			amount: item_value.amount,
+    			transaction_instrument_id: data.transaction_instrument_id,
+    		});
+    	}
 
-	const [item_value] = await iv.insert(db, {
-		scheduled_at: data.scheduled_at,
-		amount: data.amount,
-	});
-
-	await std.insert(db, {
-		id: base_transaction_type[0].id,
-		fk_id_item_value: item_value.id,
-	});
-
-	// ======================================
-	// POST INSERT
-	// ======================================
-	const month = item_value.scheduled_at.getMonth();
-	const year = item_value.scheduled_at.getFullYear();
-
-	// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
-	if (data.transfer_method_code === "cash") {
-		bip.balance_cash_insert_pipeline(db, {
-			month,
-			year,
-			cashflow_type: data.cashflow_type,
-			amount: item_value.amount,
-		});
-	} else {
-		bip.balance_bank_insert_pipeline(db, {
-			month,
-			year,
-			cashflow_type: data.cashflow_type,
-			amount: item_value.amount,
-			transaction_instrument_id: data.transaction_instrument_id,
-		});
-	}
-
-	console.log("standard inserido!");
+      // throw new Error("teste de rollback");
+      
+      transactionsFn.commitTransaction();
+    	console.log("standard inserido!");
+  } catch (error) {
+    transactionsFn.rollbackTransaction();
+    throw error;
+  }
 };
 
 async function main() {
