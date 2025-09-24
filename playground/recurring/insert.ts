@@ -18,7 +18,7 @@ import * as rt from "@data_functions/recurrence_type";
 import * as rec from "@data_functions/recurring";
 import * as ti from "@data_functions/transaction_instrument";
 import * as tm from "@data_functions/transfer_method";
-import { db } from "@database/db-instance";
+import { db, transactionsFn } from "@database/db-instance";
 import {
   drawCashflowType,
   getRealAmountValue,
@@ -40,60 +40,70 @@ interface DataType {
 }
 
 const insert = async (data: DataType) => {
-	const base_transaction_type = await btt.insert(db, {
-		description: data.description,
-		cashflow_type: data.cashflow_type,
-		fk_id_category: data.category_id,
-		fk_id_transaction_instrument: data.transaction_instrument_id,
-	});
-
-	const [recurring] = await rec.insert(db, {
-		id: base_transaction_type[0].id,
-		start_date: data.start_date,
-		end_date: data.end_date ?? null,
-		current_amount: data.amount,
-		fk_id_recurrence_type: data.recurrence_type_id,
-	});
-
-	const scheduled_at = data.start_date;
-
-	const [item_value] = await iv.insert(db, {
-		scheduled_at,
-		amount: data.amount,
-	});
-
-	await rec.register_item_value(db, {
-		fk_id_recurring: recurring.id,
-		fk_id_item_value: item_value.id,
-	});
-
-	// ======================================
-	// POST INSERT
-	// ======================================
-	const month = item_value.scheduled_at.getMonth();
-	const year = item_value.scheduled_at.getFullYear();
-
-	const realAmount = getRealAmountValue(data.cashflow_type, item_value.amount);
-
-	// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
-	if (data.transfer_method_code === "cash") {
-		bip.balance_cash_insert_pipeline(db, {
-			month,
-			year,
+	transactionsFn.beginTransaction();
+	try {
+		const base_transaction_type = await btt.insert(db, {
+			description: data.description,
 			cashflow_type: data.cashflow_type,
-			amount: item_value.amount,
+			fk_id_category: data.category_id,
+			fk_id_transaction_instrument: data.transaction_instrument_id,
 		});
-	} else {
-		bip.balance_bank_insert_pipeline(db, {
-			month,
-			year,
-			cashflow_type: data.cashflow_type,
-			amount: item_value.amount,
-			transaction_instrument_id: data.transaction_instrument_id,
+
+		const [recurring] = await rec.insert(db, {
+			id: base_transaction_type[0].id,
+			start_date: data.start_date,
+			end_date: data.end_date ?? null,
+			current_amount: data.amount,
+			fk_id_recurrence_type: data.recurrence_type_id,
 		});
+
+		const scheduled_at = data.start_date;
+
+		const [item_value] = await iv.insert(db, {
+			scheduled_at,
+			amount: data.amount,
+		});
+
+		await rec.register_item_value(db, {
+			fk_id_recurring: recurring.id,
+			fk_id_item_value: item_value.id,
+		});
+
+		// ======================================
+		// POST INSERT
+		// ======================================
+		const month = item_value.scheduled_at.getMonth();
+		const year = item_value.scheduled_at.getFullYear();
+
+		const realAmount = getRealAmountValue(
+			data.cashflow_type,
+			item_value.amount
+		);
+
+		// VERIFICAR EM QUAL BALANÇO ESSE ITEM DEVE SER INSERIDO
+		if (data.transfer_method_code === "cash") {
+			bip.balance_cash_insert_pipeline(db, {
+				month,
+				year,
+				cashflow_type: data.cashflow_type,
+				amount: item_value.amount,
+			});
+		} else {
+			bip.balance_bank_insert_pipeline(db, {
+				month,
+				year,
+				cashflow_type: data.cashflow_type,
+				amount: item_value.amount,
+				transaction_instrument_id: data.transaction_instrument_id,
+			});
+		}
+
+		transactionsFn.commitTransaction();
+		console.log("recurring inserido!");
+	} catch (error) {
+		transactionsFn.rollbackTransaction();
+		throw error;
 	}
-
-	console.log("recurring inserido!");
 };
 
 async function main() {
